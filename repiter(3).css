@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no" />
+  <meta http-equiv="proma" content="no-cache" />
+  <meta http-equiv="cache-control" content="no cache" />
+  <meta http-equiv="expires" content="0" />
+  <link rel="stylesheet" type="text/css" href="./static/css/style.css">
+  <script type="text/javascript" src="./static/js/jquery.min.js"></script>
+  <script type="text/javascript" src="./static/js/jquery.cookie.js"></script>
+  <script type="text/javascript" src="./static/js/mylang.js"></script>
+  <script>
+	if(getCookie('mylang') == 1){
+		document.write('<script src="./static/js/langsc.js"><\/script>');
+	}else if(getCookie('mylang') == 8){		
+		document.write('<script src="./static/js/langpt.js"><\/script>');
+	}else if(getCookie('mylang') == 3){	
+		document.write('<script src="./static/js/langes.js"><\/script>');
+	}else if(getCookie('mylang') == 4){	
+		document.write('<script src="./static/js/langtr.js"><\/script>');
+	}else{
+		document.write('<script src="./static/js/langen.js"><\/script>');
+	}
+  </script>
+  <script type="text/javascript" src="./static/js/config.js"></script>
+  <script type="text/javascript" src="./static/js/router.js"></script>
+  <script type="text/javascript" src="./static/js/common.js"></script>
+</head>
+
+<body style="margin:0; padding:0;">
+<div class="container" align="center">
+  <div>
+    <div class="row">
+	  <div class="col-12" style="padding:0 0 1% 0;">
+        <div align="left" class="my-toper">
+          <div class="my-header">
+            <img src="./static/images/logo.png" class="my-logo">
+			<div class="my-info">
+			  <span id="extwifiname"><script>dw(TT_SetWifiExt)</script></span>
+              <br>
+        	  <span id="extwifiinfo" style="font-size:12px;"><script>dw(TT_SetWifiExtInfo)</script></span>
+           	</div>
+          </div>
+        </div>
+        <div id="div_opmode">
+          <br>
+          <span style="font-size:20px;word-wrap:break-word;word-break:normal;"><script>dw(TT_WispModeSet)</script></span>
+          <br>
+		  <div id="wispmode" class="area pointer">		  	
+		    <img src="./static/images/wisp.png">	
+            <div align="center">
+              <button type="button" class="btn-long"><script>dw(TT_Next)</script></button>
+            </div>
+		  </div>
+		  <br>
+		  <span style="font-size:20px;word-wrap:break-word;word-break:normal;"><script>dw(TT_APModeSet)</script></span>
+		  <br>
+          <div id="apmode" class="area pointer">		    
+		    <img src="./static/images/ap.png">
+            <div align="center">
+              <button type="button" class="btn-long"><script>dw(TT_Next)</script></button>
+            </div>	
+		  </div>
+          <br>
+		  <span style="font-size:20px;word-wrap:break-word;word-break:normal;"><script>dw(TT_RouterModeSet)</script></span>
+		  <br>
+          <div id="routermode" class="area pointer">		    
+		    <img src="./static/images/router.png">
+            <div align="center">
+              <button type="button" class="btn-long"><script>dw(TT_Next)</script></button>
+            </div>
+		  </div>
+		</div>
+        <br><br>
+		<div id="div_aplist" style="display:none;">
+		  <table class="gridtable">
+			<tr id="div_select_wifi">
+			  <td colspan="2" align="center" style="font-size:18px;"><script>dw(TT_SelectExtWifi)</script></td>
+			</tr>  
+			<tbody id="getApList">
+        	  <tr onClick="selectAp('Test11','11','WPA2PSK/AES','00:11:22:33:44:55')">
+                <td align="left">&nbsp;Test111</td>
+                <td align="right" width="80"><img src="./static/images/locked-wifi-x2.png">&nbsp;
+                <img src="./static/images/wifi-full-signal-x2.png">&nbsp;</td>
+              </tr>
+              <tr onClick="selectAp('Test11','11','NONE','00:11:22:33:44:55')">
+                <td align="left">&nbsp;Test222</td>
+                <td align="right"><img src="./static/images/unlocked-wifi-x2.png">&nbsp;
+                <img src="./static/images/wifi-full-signal-x2.png">&nbsp;</td>
+              </tr>
+			</tbody>
+			<tr>
+			  <td colspan="2" align="center">
+				<button type="button" class="btn-long" id="manual_btn"><script>dw(TT_ManualSetup)</script></button>
+			  </td>
+			</tr>
+			<tr>
+			  <td colspan="2" style="word-wrap:break-word;word-break:normal;"><script>dw(TT_SelectExtWifiInfo)</script></td>
+			</tr>
+			<tr id="div_scanap" style="display:none;">
+			  <td colspan="2" align="center">
+			    <br>
+			    <button type="button" class="btn" id="backscan_btn"><script>dw(TT_Back)</script></button>
+                <button type="button" class="btn" id="scanap_btn"><script>dw(TT_Refresh)</script></button>
+                <br><br>
+			  </td>
+			</tr>
+		  </table>
+		</div>
+        <div id="div_wisp" style="display:none;">
+          <table class="gridtable">
+			<tr>
+			  <td colspan="2" align="center" style="font-size:20px;word-wrap:break-word;word-break:normal;"><script>dw(TT_WispModeSet)</script></td>
+			</tr>
+            <tr id="div_select_apssid">
+			  <td class="gl"><script>dw(TT_WifiName)</script></td>
+			  <td class="gr">
+				<input type="hidden" id="apssid">
+				<input type="hidden" id="apchannel">
+				<input type="hidden" id="apbssid">
+				<input type="hidden" id="apsec">
+				<input type="hidden" id="apenc">
+				<input type="hidden" id="manual_flag" value="auto">
+				<input type="hidden" id="opmode_flag" value="router">
+				<input type="text" id="select_apssid" disabled>
+			  </td>
+			</tr>
+			<tr id="div_refresh">
+			  <td class="gl">&nbsp;</td>
+			  <td class="gr">
+				<img src="./static/images/refresh.png" width="25" align="absmiddle" id="refresh_btn">
+			  </td>
+			</tr>
+			<tr id="div_input_apssid" style="display:none">
+			  <td class="gl"><script>dw(TT_WifiName)</script></td>
+			  <td class="gr">
+				<input type="text" id="input_apssid" maxlength="32">
+			  </td>
+			</tr>
+			<tr id="div_input_apsec" style="display:none">
+              <td class="gl"><script>dw(TT_WifiEncryption)</script></td>
+              <td class="gr">
+                <select class="select" id="input_apsec">
+                  <option value="WPA2PSK">WPA2PSK/AES</option>
+                  <option value="WPAPSK">WPAPSK/AES</option>
+                  <option value="OPEN"><script>dw(TT_NotEncrypted)</script></option>
+                </select>
+              </td>
+            </tr>
+			<tr id="div_apkey">
+			  <td class="gl"><span id="apkeymsg"></span></td>
+			  <td class="gr">
+				<input type="text" id="apkey" maxlength="63">
+			  </td>
+			</tr>
+            <tr>
+			  <td class="gl"><script>dw(TT_IpMode)</script></td>
+			  <td class="gr">
+			  	<!--<input type="radio" name="enablebridge" value="1"> <script>dw(TT_BridgeRouter)</script><br>-->
+				<input type="radio" name="enablebridge" value="0" checked> <script>dw(TT_DefaultLocal)</script>
+                
+			  </td>
+			</tr>
+			<tr>
+			  <td class="gl"><script>dw(TT_ExtendWifiName)</script></td>
+			  <td class="gr">
+				<input type="radio" name="extapname" value="0" checked> <script>dw(TT_Default)</script> (<span id="extap1"></span>)<br>
+                <input type="radio" name="extapname" value="1"> <script>dw(TT_Modify)</script> (<span id="extap2"></span>)
+			  </td>
+			</tr> 
+			<tbody id="div_changewifi" style="display:none">             
+			<tr>
+			  <td class="gl"><script>dw(TT_ExtendWifiName)</script></td>
+			  <td class="gr">
+				<input type="text" id="extssid" maxlength="32">
+			  </td>
+			</tr>
+			</tbody>
+			<tr>
+			  <td colspan="2" align="center">
+              	<button type="button" class="btn" id="back_btn"><script>dw(TT_Back)</script></button>
+				<button type="button" class="btn" id="next_btn"><script>dw(TT_Next)</script></button>
+			  </td>
+			</tr>              
+          </table>
+        </div>
+		<div id="div_ap" style="display:none;">
+          <table class="gridtable">
+			<tbody id="div_router" style="display:none;">
+			<tr>
+			  <td colspan="2" align="center" style="font-size:20px;"><script>dw(TT_RouterModeSet)</script></td>
+			</tr>
+            <tr>
+			  <td class="gl"><script>dw(TT_InternetType)</script></td>
+			  <td class="gr">
+				<select class="select" id="wanmode">
+                  <option value="1"><script>dw(TT_DhcpIp)</script></option>
+                  <option value="0"><script>dw(TT_StaticIp)</script></option>
+                  <option value="2"><script>dw(TT_Pppoe)</script></option>
+                </select>
+			  </td>
+			</tr>
+            </tbody>
+            <tbody id="div_static" style="display:none;">
+            <tr>
+			  <td class="gl"><script>dw(TT_Ip)</script></td>
+			  <td class="gr">
+				<input type="text" id="wanip" maxlength="15">
+			  </td>
+			</tr>
+            <tr>
+			  <td class="gl"><script>dw(TT_Mask)</script></td>
+			  <td class="gr">
+				<input type="text" id="wanmask" maxlength="15">
+			  </td>
+			</tr>
+            <tr>
+			  <td class="gl"><script>dw(TT_Gateway)</script></td>
+			  <td class="gr">
+				<input type="text" id="wangw" maxlength="15">
+			  </td>
+			</tr>
+            <tr>
+			  <td class="gl"><script>dw(TT_DnsPri)</script></td>
+			  <td class="gr">
+				<input type="text" id="dns1" maxlength="15">
+			  </td>
+			</tr>
+            <tr>
+			  <td class="gl"><script>dw(TT_DnsSec)</script><script>dw(TT_Optional)</script></td>
+			  <td class="gr">
+				<input type="text" id="dns2" maxlength="15">
+			  </td>
+			</tr>
+            </tbody>
+            <tbody id="div_pppoe" style="display:none;">
+            <tr>
+			  <td class="gl"><script>dw(TT_PppoeAccount)</script></td>
+			  <td class="gr">
+				<input type="text" id="pppoe_user" maxlength="32">
+			  </td>
+			</tr>
+			<tr>
+			  <td class="gl"><script>dw(TT_PppoePassword)</script></td>
+			  <td class="gr">
+				<input type="text" id="pppoe_pass" maxlength="32">
+			  </td>
+			</tr>
+            </tbody>
+            <tbody id="div_apmode">
+            <tr>
+			  <td colspan="2" align="center" style="font-size:20px;"><script>dw(TT_APModeSet)</script></td>
+			</tr>
+            </tbody>
+            <tr>
+			  <td class="gl"><script>dw(TT_WifiName)</script></td>
+			  <td class="gr">
+				<input type="text" id="wifissid" maxlength="32">
+			  </td>
+			</tr>
+			<tr>
+              <td class="gl"><script>dw(TT_WifiEncryption)</script></td>
+              <td class="gr">
+                <select class="select" id="wifisec">
+				  <option value="0"><script>dw(TT_NotEncrypted)</script></option>
+                  <option value="1" selected="selected">WPA2 PSK <script>dw(MSG_APROUTEMODE)</script></option>
+                  <option value="2">WPA/WPA2 PSK <script>dw(MSG_APROUTEMIXMODE)</script></option>
+                </select>
+              </td>
+            </tr>
+			<tr id="div_wifikey">
+			  <td class="gl"><script>dw(TT_WifiPassword)</script></td>
+			  <td class="gr">
+				<input type="text" id="wifikey" maxlength="63">
+			  </td>
+			</tr>
+          </table>
+          <br>
+		  <div align="center">
+          	<button type="button" class="btn" id="back_ap_btn"><script>dw(TT_Back)</script></button>
+			<button type="button" class="btn" id="next_ap_btn"><script>dw(TT_Next)</script></button>
+		  </div>              
+        </div>
+        <div id="div_finish" style="display:none;">
+          <table class="gridtable">
+			<tr>
+			  <td colspan="2" align="center"><img src="./static/images/set_success.png"></td>
+			</tr>
+            <tr id="div_wantype" style="display:none;">
+			  <td class="gl"><script>dw(TT_InternetType)</script></td>
+			  <td class="gr">
+				<span id="internettype"></span>
+			  </td>
+			</tr>
+			<tr id="div_wispssid">
+			  <td class="gl"><script>dw(TT_ExtendName)</script>:</td>
+			  <td class="gr">
+			 	<span id="wispssid"></span>
+			  </td>
+			</tr>
+			<tr>
+			  <td class="gl"><span id="ssidnamemsg"><script>dw(TT_ExtendWifiName)</script></span>:</td>
+			  <td class="gr">
+			 	<span id="ssidname"></span>
+			  </td>
+			</tr>
+			<tr>
+			  <td class="gl"><span id="ssidkeymsg"><script>dw(TT_ExtendWifiPass)</script></span>:</td>
+			  <td class="gr">
+				<span id="ssidkey"></span>
+			  </td>
+			</tr>
+			<tr id="div_finishinfo">
+			  <td colspan="2" align="center"><script>dw(TT_FinishInfo)</script></td>
+			</tr>
+          </table>
+          <br><br>
+          <div align="center" id="div_finishbtn">
+            <button type="button" class="btn" id="finish_btn"><script>dw(TT_Finish)</script></button>
+          </div>	
+        </div>
+        <div id="div_result" style="display:none;">
+          <table class="gridtable">
+			<tr>
+		  	  <td align="center" style="margin:10px;">
+              	<script>dw(TT_ResultInfo)</script>
+              </td>
+			</tr>
+          </table>
+        </div>
+        <br><br><br><br>
+		<div class="homefooter" align="center">
+          <a href="javascript:window.location.href='allset.html'" style="text-decoration:underline;">
+		    <br><script>dw(TT_AllSet)</script>
+          </a>
+		</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="window-wrapper" id="my-alert" style="display:none;">
+  <div class="window">
+  	<div style="float:right; padding:10px 10px 0 0;"><img src="./static/images/close.png" height="30" id="close_btn"></div>
+    <div class="window-body" style="text-align: center;">
+      <p style="font-size:16px"><span id="err-msg"></span></p>
+	  <div>
+	  	<button type="button" class="btn btn-small" id="close3_btn"><script>dw(TT_Close)</script></button>
+	  </div>
+    </div>
+  </div>
+</div>
+
+<div class="window-wrapper" id="my-wait" style="display:none;">
+  <div class="window">
+    <div class="window-body" style="text-align: center;">
+      <p><img src="./static/images/loading.gif"></p>
+      <p style="font-size:16px"><span id="wait-msg"></span></p>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+(function(){
+	if ($.cookie('lstatus')=='true'){
+		//document.location = 'http://' + document.domain + rootPath + "home.html?tt=" + new Date().getTime();
+	}
+		
+	router.getWizardAp();
+})();
+</script>
+</body>
+</html>
