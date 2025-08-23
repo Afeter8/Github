@@ -1,0 +1,17 @@
+{
+  "palabra": "banco",
+  "contextos": {
+    "ES": ["asiento", "institución financiera"],
+    "MX": ["lugar para sentarse", "institución financiera"],
+    "AR": ["asiento público"],
+    "EMOJI": "🏦 o 🪑"
+  },
+  "regionalizacion": {
+    "México": "banco = lugar para sentarse o lugar de dinero",
+    "Brasil": "banco = financeiro",
+    "Global": "palabra polisémica cultural"
+  },
+  "red_neuronal": "GPT-Tensor-RNN-Global-IA",
+  "actualizado": "autónomo",
+  "autorizado_por": "Fernando Guadalupe Mendez Espinoza"
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>FGME Reemplazo IA</title>
+  <style>
+    body {
+      background: #111;
+      color: #0ff;
+      font-family: monospace;
+      padding: 2rem;
+    }
+    input, textarea {
+      width: 100%;
+      background: #222;
+      color: #0ff;
+      border: 1px solid #0ff;
+      padding: 1rem;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>🛠️ Sistema de Reemplazo Dinámico FGME</h2>
+  <textarea id="entrada" rows="6" placeholder="Escribe algo con errores o faltantes..."></textarea>
+  <p>🔄 Resultado corregido:</p>
+  <div id="salida">Esperando entrada...</div>
+
+  <script>
+    const mapa = {
+      "1": "I",
+      "3": "E",
+      "5": "S",
+      "0": "O",
+      "!": "i",
+      "?": "q",
+      "@": "a",
+      "#": "h",
+      "a": "4",
+      "b": "8",
+      "c": "©",
+      "😀": "G",
+      "🔁": "R",
+      "🔒": "S"
+    };
+
+    function reemplazarCaracteres(texto) {
+      return texto.split("").map(c => mapa[c] || c).join("");
+    }
+
+    function bucle() {
+      const entrada = document.getElementById("entrada").value;
+      const salida = document.getElementById("salida");
+      salida.innerText = reemplazarCaracteres(entrada);
+    }
+
+    // Bucle eterno de análisis en tiempo real
+    setInterval(bucle, 2000);
+  </script>
+</body>
+</html>

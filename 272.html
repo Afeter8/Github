@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>FGME Rotador Total IA</title>
+  <style>
+    body {
+      background: #000;
+      color: #00ffcc;
+      font-family: monospace;
+      padding: 2rem;
+    }
+    textarea, pre {
+      width: 100%;
+      background: #111;
+      color: #0ff;
+      border: 1px solid #0ff;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔁 Sistema Rotador Total – FGME</h2>
+  <textarea id="entrada" rows="5" placeholder="Escribe aquí datos o texto..."></textarea>
+  <pre id="salida">Esperando rotación...</pre>
+
+  <script>
+    const biometrico = "BIO-FGME-🧬-SHA512-ROT-XOR-0001";
+
+    function rotarMayusMin(text) {
+      return [...text].map(c =>
+        c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()
+      ).join("");
+    }
+
+    function rotarNumeros(text) {
+      return text.replace(/\d/g, d => (parseInt(d) + 1) % 10);
+    }
+
+    function rotarSignos(text) {
+      return text.replace(/[^a-zA-Z0-9\s]/g, s => String.fromCharCode(s.charCodeAt(0) + 1));
+    }
+
+    function rotarEmojis(text) {
+      const emojiBase = ["😀", "😃", "😄", "😁", "😆", "😅"];
+      return text.replace(/[\u{1F600}-\u{1F64F}]/gu, e => {
+        const i = emojiBase.indexOf(e);
+        return emojiBase[(i + 1) % emojiBase.length] || "😀";
+      });
+    }
+
+    function rotarPalabras(text) {
+      return text.split(" ").reverse().join(" ");
+    }
+
+    function insertarBiometrico(text) {
+      return `${text}\n🔐 Biometría: ${biometrico}`;
+    }
+
+    function rotadorTotal(input) {
+      let salida = input;
+      salida = rotarMayusMin(salida);
+      salida = rotarNumeros(salida);
+      salida = rotarSignos(salida);
+      salida = rotarEmojis(salida);
+      salida = rotarPalabras(salida);
+      salida = insertarBiometrico(salida);
+      return salida;
+    }
+
+    // ♾️ Bucle eterno
+    setInterval(() => {
+      const entrada = document.getElementById("entrada").value;
+      document.getElementById("salida").innerText = rotadorTotal(entrada);
+    }, 5000);
+  </script>
+
+  <!-- 📦 Configuración JSON -->
+  <script type="application/json" id="fgme-config">
+  {
+    "autor": "Fernando Guadalupe Mendez Espinoza",
+    "biometrico_id": "BIO-FGME-🧬-SHA512-ROT-XOR-0001",
+    "modulos": [
+      "mayus_min",
+      "numeros",
+      "signos",
+      "emojis",
+      "palabras",
+      "texto_biometrico"
+    ],
+    "modo": "bucle_eterno",
+    "seguridad_ia": true
+  }
+  </script>
+</body>
+</html>

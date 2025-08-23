@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>FGME Diccionario IA Global</title>
+  <style>
+    body { background: #000; color: #0ff; font-family: monospace; padding: 2rem; }
+    input, select, textarea { width: 100%; background: #111; color: #0ff; padding: 1rem; margin-bottom: 1rem; border: 1px solid #0ff; }
+  </style>
+</head>
+<body>
+  <h2>🌐 Diccionario IA Global - FGME</h2>
+
+  <input id="palabra" placeholder="Introduce palabra o frase...">
+  <select id="pais">
+    <option value="MX">🇲🇽 México</option>
+    <option value="US">🇺🇸 USA</option>
+    <option value="BR">🇧🇷 Brasil</option>
+    <option value="GLOBAL">🌍 Global</option>
+  </select>
+
+  <textarea id="resultado" rows="8" readonly>Esperando entrada...</textarea>
+
+  <script>
+    const baseDiccionario = {
+      "banco": {
+        MX: ["asiento", "institución financiera"],
+        US: ["bank"],
+        BR: ["banco financeiro"],
+        GLOBAL: ["entidad económica o asiento físico"],
+        EMOJI: ["🏦", "🪑"]
+      }
+    };
+
+    function buscarDefinicion(palabra, region) {
+      const data = baseDiccionario[palabra.toLowerCase()];
+      if (!data) return "❌ Palabra no encontrada aún. Esperando aprendizaje IA...";
+      const definiciones = data[region] || data["GLOBAL"];
+      const emojis = data.EMOJI || [];
+      return `📚 Definición (${region}):\n- ${definiciones.join("\n- ")}\n\n🔤 Emojis relacionados: ${emojis.join(" ")}`;
+    }
+
+    // Bucle eterno de actualización y búsqueda
+    setInterval(() => {
+      const palabra = document.getElementById("palabra").value;
+      const pais = document.getElementById("pais").value;
+      const resultado = buscarDefinicion(palabra, pais);
+      document.getElementById("resultado").value = resultado;
+    }, 4000);
+  </script>
+
+  <!-- ⚙️ Configuración del sistema -->
+  <script type="application/json" id="fgme-config">
+  {
+    "autor": "Fernando Guadalupe Mendez Espinoza",
+    "modo": "auto_aprendizaje_global",
+    "region_activa": true,
+    "descentralizado": true,
+    "centralizado": true,
+    "neural_net": "FGME-RNN-IA",
+    "bloqueo_humano": true,
+    "bucle_eterno": true
+  }
+  </script>
+</body>
+</html>

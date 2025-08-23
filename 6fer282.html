@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>FGME Guardado Universal IA</title>
+  <style>
+    body { background: #000; color: #0ff; font-family: monospace; padding: 2rem; }
+    textarea, select, pre { width: 100%; background: #111; color: #0ff; padding: 1rem; margin-bottom: 1rem; border: 1px solid #0ff; }
+  </style>
+</head>
+<body>
+  <h2>💾 Guardado Automático Global – FGME</h2>
+
+  <textarea id="entrada" rows="4" placeholder="Escribe código, palabra, número o texto..."></textarea>
+  <select id="pais">
+    <option value="MX">🇲🇽 México</option>
+    <option value="US">🇺🇸 USA</option>
+    <option value="BR">🇧🇷 Brasil</option>
+    <option value="GLOBAL">🌍 Global</option>
+  </select>
+
+  <pre id="status">Esperando entrada...</pre>
+
+  <script>
+    const diccionarioUniversal = {};
+
+    function guardarEntrada(texto, pais) {
+      const clave = texto.trim().toLowerCase();
+      if (!clave) return;
+
+      if (!diccionarioUniversal[pais]) diccionarioUniversal[pais] = {};
+      diccionarioUniversal[pais][clave] = {
+        origen: "Fernando Guadalupe Mendez Espinoza",
+        tipo: detectarTipo(clave),
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    function detectarTipo(texto) {
+      if (/function|var|let|const/.test(texto)) return "código";
+      if (/^[a-zA-Záéíóúñü]+$/.test(texto)) return "palabra";
+      if (/^\d+$/.test(texto)) return "número";
+      if (/[\u{1F600}-\u{1F64F}]/u.test(texto)) return "emoji";
+      return "texto";
+    }
+
+    setInterval(() => {
+      const entrada = document.getElementById("entrada").value;
+      const pais = document.getElementById("pais").value;
+      guardarEntrada(entrada, pais);
+
+      document.getElementById("status").innerText = `✅ Guardado automático activo.
+Entrada: ${entrada}
+Tipo: ${detectarTipo(entrada)}
+País: ${pais}
+Total en base: ${Object.keys(diccionarioUniversal[pais] || {}).length}`;
+    }, 5000);
+  </script>
+
+  <!-- 📦 Configuración del sistema IA -->
+  <script type="application/json" id="fgme-config">
+  {
+    "autor": "Fernando Guadalupe Mendez Espinoza",
+    "funcion": "guardado_automatico",
+    "modo": "bucle_eterno",
+    "descentralizado": true,
+    "países_soportados": ["MX", "US", "BR", "GLOBAL"],
+    "seguridad": "biométrico-firma",
+    "envio_a_ipfs": true
+  }
+  </script>
+</body>
+</html>

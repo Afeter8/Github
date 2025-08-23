@@ -1,0 +1,46 @@
+{
+  "autor": "Fernando Guadalupe Mendez Espinoza",
+  "activo": true,
+  "bucle_eterno": true,
+  "firmado": true,
+  "verificacion_integridad": {
+    "tipo": "sha256",
+    "valor": "REEMPLAZAR_CON_HASH_REAL"
+  },
+  "acciones": [
+    {
+      "nombre": "Verificar Identidad",
+      "repetir": true,
+      "protegido": true
+    },
+    {
+      "nombre": "Ejecutar sistema de defensa",
+      "repetir": true,
+      "protegido": true
+    },
+    {
+      "nombre": "Actualizar aprendizaje IA",
+      "repetir": true,
+      "protegido": true
+    },
+    {
+      "nombre": "Bloquear intrusos",
+      "repetir": true,
+      "protegido": true
+    },
+    {
+      "nombre": "Crear nuevos sistemas de FGME",
+      "repetir": true,
+      "protegido": true
+    }
+  ],
+  "reinicio_automatico_si_falla": true,
+  "descentralizado": true,
+  "protegido_por": [
+    "IA",
+    "Hash",
+    "Descentralización",
+    "Blockchain",
+    "Verificación de autor"
+  ]
+}

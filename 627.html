@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>FGME - Rotación Total Binaria</title>
+  <style>
+    body { background:#000; color:#0ff; font-family:monospace; padding:2rem; }
+    pre { background:#111; padding:1rem; border:1px solid #0ff; }
+  </style>
+</head>
+<body>
+  <h2>🧠 Sistema Total Rotativo FGME (Alto + Bajo Nivel)</h2>
+
+  <h3>🔁 Entrada de texto:</h3>
+  <textarea id="entrada" rows="4" style="width:100%;background:#111;color:#0ff;"></textarea>
+
+  <h3>🔐 Código rotativo en binario:</h3>
+  <pre id="binario">Esperando entrada...</pre>
+
+  <h3>🧬 Código simulado en bajo nivel (ASM virtual):</h3>
+  <pre id="asm">MOV A, 00h</pre>
+
+  <script>
+    // Rotador de caracteres a binario + Assembly virtual
+    function textoABinario(text) {
+      return text.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
+    }
+
+    function textoAASM(text) {
+      return text.split('').map((c, i) => `MOV R${i}, ${c.charCodeAt(0)}h`).join('\n');
+    }
+
+    // Bucle eterno
+    setInterval(() => {
+      let entrada = document.getElementById("entrada").value;
+      document.getElementById("binario").innerText = textoABinario(entrada);
+      document.getElementById("asm").innerText = textoAASM(entrada);
+    }, 3000);
+  </script>
+
+  <!-- 🐍 Python embebido (IA lógica rotativa) -->
+  <script type="application/python">
+    def rotar(texto):
+        return ''.join([chr(ord(c) ^ 42) for c in texto])  # Rotación binaria XOR
+  </script>
+
+  <!-- 📦 JSON embebido con configuración IA -->
+  <script type="application/json" id="fgme-config">
+  {
+    "autor": "Fernando Guadalupe Mendez Espinoza",
+    "modo": "rotacion_total",
+    "binario_activo": true,
+    "autenticacion": "biometrico",
+    "firmado": true,
+    "blockchain": true
+  }
+  </script>
+</body>
+</html>

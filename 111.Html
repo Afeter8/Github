@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bucle Inmutable FGME</title>
+</head>
+<body style="background:black;color:lime;font-family:monospace">
+  <h2>🛡️ Bucle Eterno Inmutable FGME</h2>
+  <pre id="log"></pre>
+
+  <script>
+    const AUTOR_AUTORIZADO = "Fernando Guadalupe Mendez Espinoza";
+    const log = document.getElementById("log");
+
+    async function bucleEterno() {
+      log.innerHTML += `🔁 Activado por: ${AUTOR_AUTORIZADO}\n`;
+      while (true) {
+        try {
+          if (!AUTOR_AUTORIZADO.includes("Fernando Guadalupe Mendez Espinoza")) {
+            throw new Error("❌ Nombre no autorizado.");
+          }
+
+          log.innerHTML += `✅ Ejecutando ciclo...\n`;
+          await new Promise(res => setTimeout(res, 3000)); // 3 segundos
+        } catch (err) {
+          log.innerHTML += `⚠️ ERROR: ${err.message}\n`;
+          break;
+        }
+      }
+    }
+
+    bucleEterno();
+  </script>
+</body>
+</html>

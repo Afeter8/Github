@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>FGME Teclado Aleatorio Seguro</title>
+  <style>
+    body { background: #000; color: #0ff; font-family: monospace; padding: 2rem; }
+    #keyboard { display: flex; flex-wrap: wrap; max-width: 600px; }
+    .key {
+      border: 1px solid #0ff;
+      margin: 2px;
+      width: 40px; height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+      background: #111;
+      transition: background 0.3s;
+    }
+    .key:hover {
+      background: #0ff;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+<h2>FGME Teclado Aleatorio Seguro</h2>
+<p>Simulación para FGME con datos biométricos y bucle eterno</p>
+<div id="keyboard"></div>
+<p>Entrada: <span id="inputText"></span></p>
+
+<script>
+  const biometricoFGME = "FGME-BIOMETRICO-UNICO-2025";
+
+  const keysBase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.!?@#$%&*()".split("");
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  let currentKeys = [];
+
+  function generarTecladoAleatorio() {
+    currentKeys = shuffle([...keysBase]);
+    const keyboardDiv = document.getElementById("keyboard");
+    keyboardDiv.innerHTML = "";
+    currentKeys.forEach(key => {
+      const keyBtn = document.createElement("div");
+      keyBtn.classList.add("key");
+      keyBtn.textContent = key;
+      keyBtn.addEventListener("click", () => agregarEntrada(key));
+      keyboardDiv.appendChild(keyBtn);
+    });
+  }
+
+  let entradaTexto = "";
+
+  function agregarEntrada(letra) {
+    // Aquí se podría validar biométrico antes de aceptar entrada
+    if (!validarBiometrico(biometricoFGME)) {
+      alert("⚠️ Autenticación biométrica FGME requerida");
+      return;
+    }
+    entradaTexto += letra;
+    document.getElementById("inputText").textContent = entradaTexto;
+  }
+
+  function validarBiometrico(bio) {
+    // Simulación: solo FGME autorizado puede usar
+    return bio === biometricoFGME;
+  }
+
+  // Bucle eterno para regenerar teclado cada 60 segundos
+  setInterval(() => {
+    generarTecladoAleatorio();
+  }, 60000);
+
+  // Inicializar teclado
+  generarTecladoAleatorio();
+</script>
+
+</body>
+</html>

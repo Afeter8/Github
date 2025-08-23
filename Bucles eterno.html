@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>🔁 Bucle Eterno FGME</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --fgme-bg: #000000;
+      --fgme-color: #00ffcc;
+      --fgme-glow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--fgme-bg);
+      color: var(--fgme-color);
+      font-family: monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .fgme-contenedor {
+      text-align: center;
+      border: 2px dashed var(--fgme-color);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: var(--fgme-glow);
+      animation: infinito 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes infinito {
+      0% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+      100% {
+        transform: scale(1.03);
+        opacity: 1;
+      }
+    }
+
+    .log {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="fgme-contenedor">
+    🔁 <strong>Sistema en Bucle Eterno Activo</strong><br />
+    🛡️ <em>Protección de:</em><br />
+    <strong>Fernando Guadalupe Mendez Espinoza</strong>
+    <div class="log" id="log">Iniciando protección...</div>
+  </div>
+
+  <script>
+    const log = document.getElementById("log");
+
+    function ejecutarBucle() {
+      let contador = 0;
+      setInterval(() => {
+        contador++;
+        log.innerText = `🧠 Ciclo #${contador} ejecutado en bucle eterno (FGME)`;
+      }, 5000); // Cada 5 segundos
+    }
+
+    // 🚀 Activación automática
+    window.onload = () => {
+      console.log("🔒 Sistema FGME activado automáticamente.");
+      ejecutarBucle();
+    };
+  </script>
+</body>
+</html>

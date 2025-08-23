@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>FGME Encryptia Global</title>
+  <style>
+    body { background:#000; color:#0ff; font-family:monospace; padding:2rem; }
+    textarea, pre { width:100%; background:#111; color:#0ff; padding:1rem; margin:1rem 0; }
+  </style>
+</head>
+<body>
+  <h2>🔐 Cifrado Inteligente por País y Cultura - FGME</h2>
+
+  <textarea id="entrada" rows="4" placeholder="Texto a cifrar..."></textarea>
+  <select id="pais">
+    <option value="MX">🇲🇽 México</option>
+    <option value="US">🇺🇸 USA</option>
+    <option value="BR">🇧🇷 Brasil</option>
+    <option value="GLOBAL">🌍 Global IA</option>
+  </select>
+
+  <pre id="salida">Esperando entrada...</pre>
+
+  <script>
+    const clavesPorPais = {
+      MX: "clave-mexicana-🔥",
+      US: "key-americana-🔒",
+      BR: "chave-brasileira-💧",
+      GLOBAL: "fgme-bio-global-🌐"
+    };
+
+    function cifradoSimple(texto, clave) {
+      return [...texto].map((c, i) =>
+        String.fromCharCode(c.charCodeAt(0) ^ clave.charCodeAt(i % clave.length))
+      ).join('');
+    }
+
+    setInterval(() => {
+      const entrada = document.getElementById("entrada").value;
+      const pais = document.getElementById("pais").value;
+      const clave = clavesPorPais[pais] || clavesPorPais.GLOBAL;
+
+      const cifrado = cifradoSimple(entrada, clave);
+      document.getElementById("salida").innerText = `🔐 Cifrado (${pais}):\n` + cifrado;
+    }, 4000);
+  </script>
+
+  <!-- 🧬 JSON de configuración IA -->
+  <script type="application/json" id="fgme-config">
+  {
+    "autor": "Fernando Guadalupe Mendez Espinoza",
+    "modo": "cifrado_global",
+    "cultural_aware": true,
+    "biometrico": "BIO-FGME-🧬-UNICO",
+    "descentralizado": true,
+    "centralizado": true,
+    "encriptacion": ["AES", "RSA", "XOR", "ChaCha20"]
+  }
+  </script>
+</body>
+</html>
