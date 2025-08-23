@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Protección Start Tigo</title>
+  <link rel="stylesheet" href="estilo.css">
+  <script>
+    // Activación automática y protección
+    document.addEventListener('DOMContentLoaded', () => {
+      const userAgent = navigator.userAgent;
+      const fingerprint = btoa(userAgent + navigator.language);
+
+      // Verificar si es Fernando
+      const usuarioAutorizado = fingerprint.includes("Fernando");
+
+      if (!usuarioAutorizado) {
+        document.body.innerHTML = "<h1>Sistema bloqueado</h1>";
+        setTimeout(() => { window.close(); }, 2000);
+      } else {
+        document.getElementById("estado").classList.add("estado-seguro");
+      }
+    });
+  </script>
+</head>
+<body>
+  <h1 id="estado">Estado: Verificando identidad...</h1>
+</body>
+</html>

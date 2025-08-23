@@ -1,0 +1,40 @@
+{
+  "sistema": "StarTigo PowerPeg",
+  "version": "1.0.0",
+  "id_autorizado": "e7f72a66d3f1b6e73f7c3b9a9d1eaef6dcb5b5f7f7a9b5e9e6c9a2b3c4d5e6f7",
+  "usuario_autorizado": "Fernando Guadalupe Mendez Espinoza",
+  "nacimiento": "1993-12-02",
+  "modo": "descentralizado",
+  "protecciones": {
+    "anticlonacion": true,
+    "biometria": true,
+    "verificacion_red": true,
+    "verificacion_hardware": true,
+    "bloqueo_no_autorizado": true
+  },
+  "entorno": {
+    "tor": true,
+    "ip_rotativa": true,
+    "satelital_backup": true,
+    "seguridad_etica": true
+  },
+  "modulos_activados": [
+    "StarTigo Antivirus",
+    "StarTigo Defensa Legal",
+    "StarTigo Bank",
+    "PowerPeg Mundial",
+    "AI Code Shield"
+  ],
+  "auditoria": {
+    "log_activo": true,
+    "registro_inmutable": true,
+    "frecuencia_segundos": 60
+  },
+  "integraciones": {
+    "google": true,
+    "microsoft": true,
+    "linux": true,
+    "android": true,
+    "apple": true
+  }
+}

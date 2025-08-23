@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema IA Seguro - Fernando GM Espinoza</title>
+  <style>
+    body { font-family: monospace; background: #111; color: #0f0; padding: 1em; }
+    .log { max-height: 80vh; overflow-y: auto; border: 1px solid #0f0; padding: 1em; margin-top: 1em; background: #000; }
+  </style>
+</head>
+<body>
+  <h1>Sistema IA Seguro</h1>
+  <p>Ejecutando simulación de protección en bucle eterno...</p>
+  <div class="log" id="log"></div>
+
+  <script>
+    const nombreAutorizado = "Fernando Guadalupe Méndez Espinoza";
+    const fechaNacimiento = "1993-12-02";
+    const identificadorHash = async (input) => {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(input);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    };
+
+    const log = document.getElementById("log");
+    const appendLog = (msg) => {
+      const entry = document.createElement("div");
+      entry.textContent = `${new Date().toISOString()} > ${msg}`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    };
+
+    const verificarIdentidad = async () => {
+      const identidad = `${nombreAutorizado} ${fechaNacimiento}`;
+      const hash = await identificadorHash(identidad);
+      return hash === await identificadorHash("Fernando Guadalupe Méndez Espinoza 1993-12-02");
+    };
+
+    const sistemaAutonomo = async () => {
+      while (true) {
+        const esAutorizado = await verificarIdentidad();
+        if (!esAutorizado) {
+          appendLog("Identidad no verificada. Activando protección de emergencia.");
+          break; // o detener ejecución/aislar sistema
+        }
+        appendLog("Identidad verificada. Sistema operativo seguro.");
+        appendLog("Verificando integridad, cifrando comunicación, auditando eventos...");
+        await new Promise(res => setTimeout(res, 5000)); // ciclo cada 5 segundos
+      }
+    };
+
+    sistemaAutonomo();
+  </script>
+</body>
+</html>

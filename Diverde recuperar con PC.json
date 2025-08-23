@@ -1,0 +1,27 @@
+{
+  "sistema": "StarTigo Defensa Telecom",
+  "usuario_autorizado": {
+    "nombre": "Fernando Guadalupe Mendez Espinoza",
+    "fecha_nacimiento": "1993-12-02",
+    "ubicacion_nacimiento": "Leon, Guanajuato, México",
+    "clave_biometrica": "hash_biometrico_único"
+  },
+  "redes_monitoreadas": [
+    "Telmex", "Megacable", "Izzi", "Totalplay", "Skay", 
+    "Starlink", "CFE Internet", "Blutelecom", "Axel"
+  ],
+  "dispositivos_escucha": ["WiFi", "Bluetooth", "RF"],
+  "acciones_ante_intrusion": {
+    "generar_error_modem": true,
+    "bloquear_red_temporal": true,
+    "desactivar RF y BT": true,
+    "alerta interna IA": true
+  },
+  "sistema_recuperacion": {
+    "activo": true,
+    "modo": "aislado",
+    "validacion_exclusiva": "Fernando Guadalupe Mendez Espinoza",
+    "método": "verificación criptográfica",
+    "respaldo": "archivo_inmutable_encriptado"
+  }
+}

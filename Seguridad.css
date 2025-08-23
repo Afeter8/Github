@@ -1,0 +1,60 @@
+/* Sistema CSS para entorno descentralizado y seguro */
+
+:root {
+  --seguro-bg: #000;        /* Fondo seguro */
+  --alerta: #ff0033;        /* Rojo crítico */
+  --ok: #00ff88;            /* Verde seguro */
+  --criptografia: #001f3f;  /* Azul profundo */
+  --fuente: 'Courier New', monospace;
+}
+
+body {
+  background-color: var(--seguro-bg);
+  color: var(--ok);
+  font-family: var(--fuente);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+header, footer {
+  background-color: var(--criptografia);
+  text-align: center;
+  padding: 10px;
+}
+
+.status {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background-color: var(--alerta);
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: bold;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.1; }
+  100% { opacity: 1; }
+}
+
+.auto-blindado {
+  background: linear-gradient(45deg, var(--criptografia), var(--ok));
+  padding: 20px;
+  border: 3px solid var(--alerta);
+  border-radius: 10px;
+  animation: seguridad 10s infinite;
+}
+
+@keyframes seguridad {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.invisible {
+  display: none !important;
+}
