@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FGME - Sistema Integral de Ciberseguridad</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-blue: #0d47a1;
+      --dark-blue: #082c66;
+      --light-blue: #42a5f5;
+      --accent-blue: #2979ff;
+      --scan-blue: #00e5ff;
+      --bg-color: #000b29;
+      --panel-bg: rgba(13, 71, 161, 0.15);
+      --border-color: #1565c0;
+      --error-color: #f44336;
+      --warning-color: #ff9800;
+      --success-color: #4caf50;
+      --text-light: #e3f2fd;
+      --text-gray: #bbdefb;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-light);
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      padding: 20px;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 30px;
+      position: relative;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .logo i {
+      font-size: 2.5rem;
+      color: var(--light-blue);
+    }
+    
+    h1 {
+      color: var(--light-blue);
+      text-shadow: 0 0 10px var(--light-blue);
+      margin: 0;
+      animation: pulse 3s infinite;
+      font-size: 2.2rem;
+    }
+    
+    @keyframes pulse {
+      0% { text-shadow: 0 0 10px var(--light-blue); }
+      50% { text-shadow: 0 0 20px var(--light-blue), 0 0 30px var(--accent-blue); }
+      100% { text-shadow: 0 0 10px var(--light-blue); }
+    }
+    
+    .subtitle {
+      color: var(--text-gray);
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .system-status {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      font-size: .9em;
+      gap: .5rem;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .panel {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 0 10px rgba(21, 101, 192, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+      animation: scanline 3s linear infinite;
+    }
+    
+    @keyframes scanline {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .panel h2 {
+      color: var(--light-blue);
+      margin-top: 0;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: .5rem;
+      font-size: 1.2rem;
+    }
+    
+    .panel-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .panel-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-light);
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      transition: all .2s;
+    }
+    
+    .panel-btn:hover {
+      background-color: var(--accent-blue);
+      color: #000;
+    }
+    
+    .status {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      margin-bottom: 10px;
+    }
+    
+    .status-indicator {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(66, 165, 245, 0.15) inset;
+    }
+    
+    .status-active {
+      background-color: var(--success-color);
+      box-shadow: 0 0 10px var(--success-color);
+      animation: pulse-glow 2s infinite;
+    }
+    
+    .status-warning {
+      background-color: var(--warning-color);
+      box-shadow: 0 0 10px var(--warning-color);
+      animation: pulse-glow 1s infinite;
+    }
+    
+    .status-inactive {
+      background-color: var(--error-color);
+      box-shadow: 0 0 10px var(--error-color);
+    }
+    
+    @keyframes pulse-glow {
+      0% { opacity: .7; }
+      50% { opacity: 1; }
+      100% { opacity: .7; }
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .stat-item {
+      background-color: rgba(13, 71, 161, 0.2);
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(21, 101, 192, 0.3);
+    }
+    
+    .stat-value {
+      font-weight: bold;
+      color: var(--light-blue);
+    }
+    
+    .log-container {
+      height: 200px;
+      overflow-y: auto;
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      margin-top: 10px;
+      font-size: .9em;
+    }
+    
+    .log-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .log-container::-webkit-scrollbar-thumb {
+      background: var(--primary-blue);
+      border-radius: 3px;
+    }
+    
+    .log-entry {
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid rgba(21, 101, 192, 0.3);
+      line-height: 1.4;
+    }
+    
+    .log-timestamp {
+      color: var(--light-blue);
+      margin-right: 10px;
+    }
+    
+    .log-warning {
+      color: var(--warning-color);
+    }
+    
+    .log-error {
+      color: var(--error-color);
+      font-weight: 700;
+    }
+    
+    .log-critical {
+      color: var(--error-color);
+      font-weight: 800;
+      animation: blink .5s infinite alternate;
+    }
+    
+    @keyframes blink {
+      from { opacity: 1; }
+      to { opacity: .7; }
+    }
+    
+    .threat-map-container {
+      position: relative;
+    }
+    
+    .threat-map {
+      height: 320px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      margin-top: 20px;
+      background-image: 
+        linear-gradient(rgba(13, 71, 161, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(13, 71, 161, 0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+      border-radius: 8px;
+    }
+    
+    .threat {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--error-color);
+      box-shadow: 0 0 10px var(--error-color);
+      animation: threat-pulse 2s infinite;
+    }
+    
+    .threat-line {
+      position: absolute;
+      background: linear-gradient(90deg, transparent, var(--error-color), transparent);
+      height: 1px;
+      transform-origin: 0 0;
+    }
+    
+    @keyframes threat-pulse {
+      0% { opacity: .3; transform: scale(.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+      100% { opacity: .3; transform: scale(.8); }
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      background-color: var(--panel-bg);
+      color: var(--text-light);
+      border: 1px solid var(--border-color);
+      padding: 12px 24px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      transition: all .3s;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(66, 165, 245, 0.2), transparent);
+      transition: .5s;
+      z-index: -1;
+    }
+    
+    button:hover {
+      background-color: var(--accent-blue);
+      color: #000;
+      box-shadow: 0 0 15px var(--accent-blue);
+    }
+    
+    button:hover::before {
+      left: 100%;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    
+    .modal-content {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 640px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(66, 165, 245, 0.3);
+      position: relative;
+      border-radius: 10px;
+    }
+    
+    .close-modal {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      font-size: 22px;
+      cursor: pointer;
+    }
+    
+    .scan-animation {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(transparent 90%, rgba(0, 229, 255, 0.1) 90%), 
+                linear-gradient(90deg, transparent 90%, rgba(0, 229, 255, 0.1) 90%);
+      background-size: 20px 20px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 99;
+      animation: scan 3s linear;
+    }
+    
+    @keyframes scan {
+      0% { opacity: 0; background-position: 0 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; background-position: 100% 100%; }
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px;
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      box-shadow: 0 0 15px rgba(66, 165, 245, 0.3);
+      transform: translateX(150%);
+      transition: transform .3s;
+      z-index: 101;
+      min-width: 280px;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification-warning {
+      border-color: var(--warning-color);
+    }
+    
+    .notification-error {
+      border-color: var(--error-color);
+    }
+    
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      button {
+        width: 100%;
+        max-width: 320px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <h1>FGME - SISTEMA INTEGRAL DE CIBERSEGURIDAD</h1>
+      </div>
+      <p class="subtitle">Protección en tiempo real de todos los activos digitales</p>
+      <div class="system-status">
+        <div class="status-indicator status-active"></div>
+        <span>Sistema Operativo</span>
+      </div>
+    </header>
+    
+    <!-- Dashboard principal -->
+    <div class="dashboard">
+      <!-- WAF -->
+      <section class="panel" aria-labelledby="waf-title">
+        <h2 id="waf-title">
+          Firewall (WAF)
+          <div class="panel-actions">
+            <button class="panel-btn" title="Configurar" data-action="config-waf">⚙️</button>
+            <button class="panel-btn" title="Ver estadísticas" data-action="stats-waf">📊</button>
+          </div>
+        </h2>
+        <div class="status">
+          <div class="status-indicator status-active"></div>
+          <span>Estado: Activo</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">Reglas activas: <span class="stat-value" id="waf-rules">1,248</span></div>
+          <div class="stat-item">Paquetes filtrados: <span class="stat-value" id="waf-packets">542/min</span></div>
+          <div class="stat-item">Intentos bloqueados: <span class="stat-value" id="waf-blocked">12</span></div>
+          <div class="stat-item">CPU: <span class="stat-value" id="waf-cpu">24%</span></div>
+        </div>
+        <div class="log-container" id="waf-log" aria-label="Registro WAF"></div>
+      </section>
+      
+      <!-- IPS -->
+      <section class="panel" aria-labelledby="ips-title">
+        <h2 id="ips-title">
+          Sistema de Prevención de Intrusiones (IPS)
+          <div class="panel-actions">
+            <button class="panel-btn" title="Configurar" data-action="config-ips">⚙️</button>
+            <button class="panel-btn" title="Ver alertas" data-action="alerts-ips">🔔</button>
+          </div>
+        </h2>
+        <div class="status">
+          <div class="status-indicator status-active"></div>
+          <span>Estado: Activo</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">Alertas: <span class="stat-value" id="ips-alerts">12/min</span></div>
+          <div class="stat-item">Patrones cargados: <span class="stat-value">8,451</span></div>
+          <div class="stat-item">Detecciones: <span class="stat-value" id="ips-detections">3</span></div>
+          <div class="stat-item">CPU: <span class="stat-value">38%</span></div>
+        </div>
+        <div class="log-container" id="ips-log" aria-label="Registro IPS"></div>
+      </section>
+      
+      <!-- Malware -->
+      <section class="panel" aria-labelledby="malware-title">
+        <h2 id="malware-title">
+          Protección Malware
+          <div class="panel-actions">
+            <button class="panel-btn" title="Escaneo rápido" data-action="quick-scan">🔍</button>
+            <button class="panel-btn" title="Actualizar firmas" data-action="update-sigs">🔄</button>
+          </div>
+        </h2>
+        <div class="status">
+          <div class="status-indicator status-active"></div>
+          <span>Estado: Activo</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">Firmas: <span class="stat-value">5,821,447</span></div>
+          <div class="stat-item">Archivos escaneados: <span class="stat-value" id="files-scanned">12,458</span></div>
+          <div class="stat-item">Último análisis: <span class="stat-value" id="last-scan">Hoy 10:30</span></div>
+          <div class="stat-item">CPU: <span class="stat-value">15%</span></div>
+        </div>
+        <div class="log-container" id="malware-log" aria-label="Registro Malware"></div>
+      </section>
+      
+      <!-- DDoS -->
+      <section class="panel" aria-labelledby="ddos-title">
+        <h2 id="ddos-title">
+          Protección DDoS
+          <div class="panel-actions">
+            <button class="panel-btn" title="Ver tráfico" data-action="traffic-ddos">📡</button>
+            <button class="panel-btn" title="Configurar umbrales" data-action="thresholds-ddos">📈</button>
+          </div>
+        </h2>
+        <div class="status">
+          <div class="status-indicator status-active"></div>
+          <span>Estado: Activo</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">Ataques actuales: <span class="stat-value" id="ddos-attacks">0</span></div>
+          <div class="stat-item">Tráfico: <span class="stat-value" id="ddos-traffic">45 Mbps</span></div>
+          <div class="stat-item">Conexiones: <span class="stat-value" id="ddos-connections">1,248</span></div>
+          <div class="stat-item">CPU: <span class="stat-value">12%</span></div>
+        </div>
+        <div class="log-container" id="ddos-log" aria-label="Registro DDoS"></div>
+      </section>
+      
+      <!-- Auth -->
+      <section class="panel" aria-labelledby="auth-title">
+        <h2 id="auth-title">
+          Autenticación y Acceso
+          <div class="panel-actions">
+            <button class="panel-btn" title="Ver usuarios" data-action="users-auth">👥</button>
+            <button class="panel-btn" title="Registro de acceso" data-action="audit-auth">📋</button>
+          </div>
+        </h2>
+        <div class="status">
+          <div class="status-indicator status-active"></div>
+          <span>Estado: Activo</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">2FA: <span class="stat-value">Activado</span></div>
+          <div class="stat-item">Usuarios activos: <span class="stat-value" id="users-active">3</span></div>
+          <div class="stat-item">Intentos fallidos: <span class="stat-value" id="login-fails">2</span></div>
+          <div class="stat-item">CPU: <span class="stat-value">8%</span></div>
+        </div>
+        <div class="log-container" id="auth-log" aria-label="Registro Autenticación"></div>
+      </section>
+      
+      <!-- Net Mon -->
+      <section class="panel" aria-labelledby="net-title">
+        <h2 id="net-title">
+          Monitorización de Red
+          <div class="panel-actions">
+            <button class="panel-btn" title="Ver gráficos" data-action="graphs-net">📊</button>
+            <button class="panel-btn" title="Configurar" data-action="config-net">⚙️</button>
+          </div>
+        </h2>
+        <div class="status">
+          <div class="status-indicator status-active"></div>
+          <span>Estado: Activo</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">Ancho de banda: <span class="stat-value" id="bw">45 Mbps</span></div>
+          <div class="stat-item">Dispositivos: <span class="stat-value" id="devices">24</span></div>
+          <div class="stat-item">Latencia: <span class="stat-value" id="latency">45ms</span></div>
+          <div class="stat-item">CPU: <span class="stat-value">21%</span></div>
+        </div>
+        <div class="log-container" id="network-log" aria-label="Registro Red"></div>
+      </section>
+    </div>
+    
+    <section class="panel threat-map-container" aria-labelledby="threat-title">
+      <h2 id="threat-title">Mapa de Amenazas Global</h2>
+      <div class="threat-map" id="threat-map"></div>
+    </section>
+    
+    <div class="controls">
+      <button id="btn-scan">Ejecutar Escaneo Completo</button>
+      <button id="btn-lockdown">Activar Modo Lockdown</button>
+      <button id="btn-update">Actualizar Firmware</button>
+      <button id="btn-report">Generar Reporte</button>
+    </div>
+  </div>
+
+  <!-- Modales -->
+  <div class="modal" id="lockdown-modal">
+    <div class="modal-content">
+      <button class="close-modal" id="close-lockdown">&times;</button>
+      <h2>ACTIVAR MODO LOCKDOWN</h2>
+      <p>¿Está seguro de que desea activar el modo lockdown? Esto restringirá severamente el acceso al sistema.</p>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button id="confirm-lockdown">Confirmar</button>
+        <button id="cancel-lockdown">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="update-modal">
+    <div class="modal-content">
+      <button class="close-modal" id="close-update">&times;</button>
+      <h2>ACTUALIZAR FIRMWARE</h2>
+      <p>Versión disponible: <span id="fw-version">v2.7.3</span></p>
+      <p>Esta operación puede tardar varios minutos y requerirá reiniciar los sistemas.</p>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button id="confirm-update">Iniciar actualización</button>
+        <button id="cancel-update">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="scan-animation" id="scan-animation"></div>
+
+  <div class="notification" id="notification">
+    <div id="notification-message">Notificación del sistema</div>
+  </div>
+
+  <script>
+    // ===== Configuración de endpoints (ajusta para backend real) =====
+    const API = {
+      logs: '/api/logs',           // GET ?system=waf|ips|...
+      scan: '/api/scan',           // POST {full:true}
+      lockdown: '/api/lockdown',   // POST {enable:true|false}
+      update: '/api/update',       // POST {version:"vX.Y.Z"}
+      report: '/api/report'        // GET -> Blob PDF
+    };
+    const WS_URL = 'wss://forge.azulia/ws/logs'; // opcional
+
+    // ===== Simulación / fallback =====
+    const isDemo = true; // cambia a false cuando conectes el backend
+
+    class CyberSecuritySystem {
+      constructor() {
+        this.logs = {
+          waf: document.getElementById('waf-log'),
+          ips: document.getElementById('ips-log'),
+          malware: document.getElementById('malware-log'),
+          ddos: document.getElementById('ddos-log'),
+          auth: document.getElementById('auth-log'),
+          network: document.getElementById('network-log'),
+        };
+        this.threatMap = document.getElementById('threat-map');
+        this.scanAnimation = document.getElementById('scan-animation');
+        this.notification = document.getElementById('notification');
+        this.notificationMessage = document.getElementById('notification-message');
+        this.lockdownModal = document.getElementById('lockdown-modal');
+        this.updateModal = document.getElementById('update-modal');
+        this.lockdownBtn = document.getElementById('btn-lockdown');
+        this.isLockdown = false;
+        this.init();
+      }
+
+      init() {
+        // WebSocket (si está disponible)
+        this.initWebSocket();
+
+        // Generación de logs demo
+        this.startLogGeneration('waf', [
+          'Bloqueado intento de SQLi desde 192.168.1.23',
+          'Regla XSS activada en /contact',
+          'Solicitud sospechosa bloqueada: /wp-admin',
+          'Actualizadas reglas de firewall: +12 nuevas'
+        ], 3000);
+
+        this.startLogGeneration('ips', [
+          'Intento de acceso SSH detectado desde RU',
+          'Escaneo de puertos bloqueado en 10.0.0.5',
+          'Comando sospechoso en tráfico HTTP',
+          'Patrón de ataque DDoS identificado y mitigado'
+        ], 4000);
+
+        this.startLogGeneration('malware', [
+          'Archivo limpio: document.pdf [hash: a1b2c3d4]',
+          'Archivo limpio: imagen.jpg [hash: e5f6g7h8]',
+          'Análisis de memoria completado - 0 detecciones',
+          'Firmas actualizadas: +1,247'
+        ], 5000);
+
+        this.startLogGeneration('ddos', [
+          'Tráfico normal: 45Mbps entrante, 12Mbps saliente',
+          'Paquetes filtrados: 120/s, umbral: 1000/s',
+          'Conexiones legítimas: 45, sospechosas: 0',
+          'Patrón anómalo detectado y analizado'
+        ], 6000);
+
+        this.startLogGeneration('auth', [
+          'Usuario admin autenticado desde 10.0.0.12',
+          '2FA exitosa para usuario jperez',
+          'Nuevo dispositivo: notificación enviada',
+          'Intento fallido para usuario desconocido'
+        ], 7000);
+
+        this.startLogGeneration('network', [
+          'Ancho de banda estable: 45Mbps/100Mbps (45%)',
+          'Latencia: 45ms, fluctuación: 2ms',
+          'Servidores operativos: 12/12 (100% uptime)',
+          'Conexiones simultáneas: 1,248 / 5,000'
+        ], 8000);
+
+        this.updateThreatMap();
+        setInterval(() => this.updateThreatMap(), 5000);
+
+        // Botones
+        document.getElementById('btn-scan').addEventListener('click', () => this.runFullScan());
+        this.lockdownBtn.addEventListener('click', () => this.showLockdownModal());
+        document.getElementById('btn-update').addEventListener('click', () => this.showUpdateModal());
+        document.getElementById('btn-report').addEventListener('click', () => this.generateReport());
+
+        // Modales
+        document.getElementById('close-lockdown').addEventListener('click', () => this.hideLockdownModal());
+        document.getElementById('close-update').addEventListener('click', () => this.hideUpdateModal());
+        document.getElementById('confirm-lockdown').addEventListener('click', () => this.activateLockdown());
+        document.getElementById('cancel-lockdown').addEventListener('click', () => this.hideLockdownModal());
+        document.getElementById('confirm-update').addEventListener('click', () => this.updateFirmware());
+        document.getElementById('cancel-update').addEventListener('click', () => this.hideUpdateModal());
+
+        // Acciones de panel
+        document.querySelectorAll('.panel-btn').forEach((btn) => {
+          btn.addEventListener('click', () => this.showNotification('Función en desarrollo - Próxima actualización', 'warning'));
+        });
+
+        // Bienvenida
+        setTimeout(() => this.showNotification('Sistema FGME inicializado correctamente', 'info'), 600);
+      }
+
+      initWebSocket() {
+        try {
+          const ws = new WebSocket(WS_URL);
+          ws.addEventListener('message', (ev) => {
+            try {
+              const evt = JSON.parse(ev.data);
+              if (evt.system && evt.message) this.addLogEntry(evt.system, evt.message, evt.type || 'info');
+            } catch (e) { /* ignore */ }
+          });
+          ws.addEventListener('open', () => this.addLogEntry('network', 'Canal seguro de eventos conectado (WS)', 'info'));
+          ws.addEventListener('close', () => this.addLogEntry('network', 'WS cerrado, usando modo local', 'warning'));
+        } catch { /* noop */ }
+      }
+
+      startLogGeneration(system, messages, interval) {
+        for (let i = 0; i < 5; i++) this.addLogEntry(system, messages[Math.floor(Math.random()*messages.length)]);
+        setInterval(() => {
+          this.addLogEntry(system, messages[Math.floor(Math.random()*messages.length)]);
+          if (Math.random() < 0.1) {
+            const types = ['warning', 'error'];
+            const type = types[Math.floor(Math.random()*types.length)];
+            const warningMessages = [
+              'Alerta: Comportamiento inusual detectado',
+              'Error: Recurso temporalmente no disponible',
+              'Advertencia: Aumento inusual de tráfico'
+            ];
+            this.addLogEntry(system, warningMessages[Math.floor(Math.random()*warningMessages.length)], type);
+          }
+        }, interval);
+      }
+
+      addLogEntry(system, message, type = 'info') {
+        const logContainer = this.logs[system];
+        if (!logContainer) return;
+
+        const el = document.createElement('div');
+        el.className = `log-entry log-${type}`;
+        const now = new Date();
+        const ts = `[${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}]`;
+        el.innerHTML = `<span class="log-timestamp">${ts}</span> ${message}`;
+        logContainer.appendChild(el);
+
+        while (logContainer.children.length > 50) logContainer.removeChild(logContainer.firstChild);
+        logContainer.scrollTop = logContainer.scrollHeight;
+
+        if (type === 'error') this.showNotification(message, 'error');
+      }
+
+      updateThreatMap() {
+        const map = this.threatMap;
+        map.innerHTML = '';
+        const count = Math.floor(Math.random() * 15) + 5;
+
+        for (let i = 0; i < count; i++) {
+          const t = document.createElement('div');
+          t.className = 'threat';
+          const x = Math.floor(Math.random() * (map.offsetWidth - 20));
+          const y = Math.floor(Math.random() * (map.offsetHeight - 20));
+          const size = Math.random() * 10 + 5;
+          t.style.left = `${x}px`;
+          t.style.top = `${y}px`;
+          t.style.width = `${size}px`;
+          t.style.height = `${size}px`;
+
+          if (i > 0 && Math.random() < 0.3) {
+            const prev = map.lastChild;
+            if (prev) {
+              const prevX = parseInt(prev.style.left) + parseInt(prev.style.width)/2;
+              const prevY = parseInt(prev.style.top) + parseInt(prev.style.height)/2;
+              const curX = x + size/2;
+              const curY = y + size/2;
+              const dx = curX - prevX;
+              const dy = curY - prevY;
+              const dist = Math.sqrt(dx*dx + dy*dy);
+              const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+              const line = document.createElement('div');
+              line.className = 'threat-line';
+              line.style.width = `${dist}px`;
+              line.style.left = `${prevX}px`;
+              line.style.top = `${prevY}px`;
+              line.style.transform = `rotate(${angle}deg)`;
+              map.appendChild(line);
+            }
+          }
+          map.appendChild(t);
+        }
+      }
+
+      runFullScan() {
+        this.addLogEntry('malware', 'Iniciando escaneo completo del sistema...', 'info');
+        this.showNotification('Iniciando escaneo de seguridad completo', 'info');
+        
+        this.scanAnimation.style.animation = 'none';
+        requestAnimationFrame(() => {
+          this.scanAnimation.style.animation = 'scan 3s linear';
+        });
+
+        let progress = 0;
+        const step = () => {
+          progress += 10;
+          this.addLogEntry('malware', `Escaneo en progreso: ${progress}%`, 'info');
+          if (progress === 50) this.addLogEntry('malware', 'Analizando sectores críticos...', 'info');
+          if (progress < 100) setTimeout(step, 500);
+          else {
+            this.addLogEntry('malware', 'Escaneo completado: 0 amenazas detectadas', 'info');
+            this.showNotification('Escaneo completado - Sistema seguro', 'info');
+          }
+        };
+        setTimeout(step, 400);
+
+        // Llamada backend opcional
+        if (!isDemo) fetch(API.scan, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ full: true })
+        });
+      }
+
+      showLockdownModal() {
+        this.lockdownModal.style.display = 'flex';
+      }
+
+      hideLockdownModal() {
+        this.lockdownModal.style.display = 'none';
+      }
+
+      showUpdateModal() {
+        this.updateModal.style.display = 'flex';
+      }
+
+      hideUpdateModal() {
+        this.updateModal.style.display = 'none';
+      }
+
+      activateLockdown() {
+        this.hideLockdownModal();
+        if (this.isLockdown) return this.showNotification('El modo lockdown ya está activo', 'warning');
+        
+        this.isLockdown = true;
+        this.addLogEntry('auth', 'Activando modo lockdown...', 'warning');
+        this.showNotification('Activando modo lockdown - Restringiendo acceso', 'warning');
+        
+        setTimeout(() => {
+          this.addLogEntry('auth', 'Lockdown activado: acceso restringido', 'warning');
+          this.addLogEntry('waf', 'Reglas endurecidas', 'warning');
+          this.addLogEntry('ips', 'Sensibilidad máxima', 'warning');
+          
+          document.querySelectorAll('.status-indicator').forEach((i) => {
+            i.classList.remove('status-active','status-inactive');
+            i.classList.add('status-warning');
+          });
+          
+          this.lockdownBtn.textContent = 'Desactivar Lockdown';
+          this.lockdownBtn.onclick = () => this.deactivateLockdown();
+          this.showNotification('Modo lockdown activado con éxito', 'info');
+        }, 1200);
+
+        if (!isDemo) fetch(API.lockdown, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ enable: true })
+        });
+      }
+
+      deactivateLockdown() {
+        this.isLockdown = false;
+        this.addLogEntry('auth', 'Desactivando modo lockdown...', 'info');
+        
+        setTimeout(() => {
+          this.addLogEntry('auth', 'Lockdown desactivado: acceso normal', 'info');
+          
+          document.querySelectorAll('.status-indicator').forEach((i) => {
+            i.classList.remove('status-warning');
+            i.classList.add('status-active');
+          });
+          
+          this.lockdownBtn.textContent = 'Activar Modo Lockdown';
+          this.lockdownBtn.onclick = () => this.showLockdownModal();
+          this.showNotification('Modo lockdown desactivado', 'info');
+        }, 1200);
+
+        if (!isDemo) fetch(API.lockdown, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ enable: false })
+        });
+      }
+
+      updateFirmware() {
+        this.hideUpdateModal();
+        this.addLogEntry('network', 'Iniciando actualización de firmware...', 'info');
+        this.showNotification('Iniciando actualización de firmware', 'info');
+        
+        setTimeout(() => this.addLogEntry('network','Descargando actualización: 30%','info'), 600);
+        setTimeout(() => this.addLogEntry('network','Descargando actualización: 70%','info'), 1400);
+        setTimeout(() => this.addLogEntry('network','Verificando integridad del paquete...','info'), 2200);
+        setTimeout(() => {
+          this.addLogEntry('network','Aplicando actualización...','info');
+          this.addLogEntry('waf','Reiniciando servicio de firewall...','warning');
+          this.addLogEntry('ips','Reiniciando servicio de prevención...','warning');
+        }, 3200);
+        
+        setTimeout(() => {
+          const newV = 'v2.5.1';
+          document.getElementById('fw-version').textContent = newV;
+          this.addLogEntry('network', `Actualización completada: versión ${newV}`, 'info');
+          this.addLogEntry('network', 'Reiniciando sistemas...', 'info');
+          
+          document.querySelectorAll('.log-container').forEach(l => l.innerHTML = '');
+          this.addLogEntry('network','Sistema reiniciado correctamente','info');
+          this.showNotification('Actualización completada con éxito', 'info');
+        }, 5200);
+
+        if (!isDemo) fetch(API.update, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ version: document.getElementById('fw-version').textContent })
+        });
+      }
+
+      async generateReport() {
+        this.addLogEntry('network', 'Generando reporte de seguridad...', 'info');
+        this.showNotification('Generando reporte del sistema', 'info');
+        
+        if (isDemo) {
+          // Genera un archivo JSON como demo y dispara descarga
+          const payload = {
+            ts: new Date().toISOString(),
+            summary: 'FGME – Estado general OK',
+            waf: this.compactLog('waf'),
+            ips: this.compactLog('ips'),
+            malware: this.compactLog('malware'),
+            ddos: this.compactLog('ddos'),
+            auth: this.compactLog('auth'),
+            network: this.compactLog('network')
+          };
+          
+          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `fgme-security-report-${Date.now()}.json`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          
+          this.addLogEntry('network', 'Reporte generado (demo): JSON descargado', 'info');
+          this.showNotification('Reporte generado (demo) descargado', 'info');
+        } else {
+          const res = await fetch(API.report);
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'fgme-security-report.pdf';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          
+          this.addLogEntry('network', 'Reporte generado: fgme-security-report.pdf', 'info');
+          this.showNotification('Reporte generado con éxito', 'info');
+        }
+      }
+
+      compactLog(system) {
+        const items = Array.from(this.logs[system]?.children || []).slice(-20).map(el => el.textContent);
+        return items;
+      }
+
+      showNotification(message, type = 'info') {
+        this.notificationMessage.textContent = message;
+        this.notification.className = 'notification show';
+        if (type === 'warning') this.notification.classList.add('notification-warning');
+        else if (type === 'error') this.notification.classList.add('notification-error');
+        
+        setTimeout(() => this.notification.classList.remove('show'), 4200);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => new CyberSecuritySystem());
+  </script>
+</body>
+</html>
