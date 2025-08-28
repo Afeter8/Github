@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fénix Azulia - Sistema Integral Completo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #020612;
+            --bg-soft: #061027;
+            --card: #0b1631;
+            --text: #eaf6ff;
+            --muted: #9cc1e8;
+            --brand: #5bd0ff;
+            --brand-2: #00a8ff;
+            --ok: #2de3a0;
+            --warn: #ffe37d;
+            --err: #ff6b6b;
+            --border: #153056;
+            --neon-1: #5bd0ff;
+            --neon-2: #9ae6ff;
+            --neon-3: #00ccff;
+            --neon-4: #5bf7ff;
+            --fgme-1: #ff2a6d;
+            --fgme-2: #05d9e8;
+            --fgme-3: #d1f7ff;
+            --fgme-4: #005678;
+            --startigo-1: #00e0b8;
+            --startigo-2: #005a4e;
+            --startigo-3: #00332d;
+            --quantum-1: #a68aff;
+            --quantum-2: #5d34a7;
+            --quantum-3: #2e1157;
+            --cosmic-1: #ff7be5;
+            --cosmic-2: #a63b8f;
+            --cosmic-3: #5c1a51;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(ellipse at center, var(--bg) 0%, var(--bg-soft) 70%);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 2.8rem;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, var(--fgme-1), var(--fgme-2), var(--brand), var(--startigo-1), var(--quantum-1), var(--cosmic-1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(91, 208, 255, 0.3);
+            position: relative;
+        }
+
+        .logo::after {
+            content: "FGME + StarTigo + Quantum + Cósmico";
+            position: absolute;
+            top: -15px;
+            right: -180px;
+            font-size: 0.8rem;
+            color: var(--fgme-1);
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .tagline {
+            color: var(--muted);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .system-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .system-btn {
+            background: rgba(2, 6, 18, 0.7);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .system-btn:hover, .system-btn.active {
+            border-color: var(--fgme-2);
+            box-shadow: 0 6px 18px rgba(5, 217, 232, 0.2), inset 0 0 8px rgba(5, 217, 232, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .system-btn.fgme.active {
+            border-color: var(--fgme-1);
+            box-shadow: 0 6px 18px rgba(255, 42, 109, 0.2), inset 0 0 8px rgba(255, 42, 109, 0.1);
+        }
+
+        .system-btn.startigo.active {
+            border-color: var(--startigo-1);
+            box-shadow: 0 6px 18px rgba(0, 224, 184, 0.2), inset 0 0 8px rgba(0, 224, 184, 0.1);
+        }
+
+        .system-btn.quantum.active {
+            border-color: var(--quantum-1);
+            box-shadow: 0 6px 18px rgba(166, 138, 255, 0.2), inset 0 0 8px rgba(166, 138, 255, 0.1);
+        }
+
+        .system-btn.cosmic.active {
+            border-color: var(--cosmic-1);
+            box-shadow: 0 6px 18px rgba(255, 123, 229, 0.2), inset 0 0 8px rgba(255, 123, 229, 0.1);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-around;
+            background: var(--card);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 5px 15px;
+            min-width: 140px;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .status-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-online {
+            color: var(--ok);
+        }
+
+        .status-offline {
+            color: var(--err);
+        }
+
+        .status-pulse {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--ok);
+            box-shadow: 0 0 0 rgba(45, 227, 160, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(45, 227, 160, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(45, 227, 160, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(45, 227, 160, 0);
+            }
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(91,208,255,.08), rgba(0,168,255,.05));
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 35px rgba(0,0,0,.3), inset 0 0 0 1px rgba(255,255,255,.03);
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--fgme-1), var(--fgme-2), var(--brand));
+        }
+
+        .card.startigo::before {
+            background: linear-gradient(to right, var(--startigo-1), var(--fgme-2), var(--brand));
+        }
+
+        .card.quantum::before {
+            background: linear-gradient(to right, var(--quantum-1), var(--fgme-2), var(--brand));
+        }
+
+        .card.cosmic::before {
+            background: linear-gradient(to right, var(--cosmic-1), var(--fgme-2), var(--brand));
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(0,0,0,.4), inset 0 0 0 1px rgba(255,255,255,.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(21, 48, 86, 0.5);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--fgme-2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card.startigo .card-title {
+            color: var(--startigo-1);
+        }
+
+        .card.quantum .card-title {
+            color: var(--quantum-1);
+        }
+
+        .card.cosmic .card-title {
+            color: var(--cosmic-1);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(5, 217, 232, 0.1);
+            border-radius: 10px;
+            font-size: 1.5rem;
+            color: var(--fgme-2);
+        }
+
+        .card.startigo .card-icon {
+            background: rgba(0, 224, 184, 0.1);
+            color: var(--startigo-1);
+        }
+
+        .card.quantum .card-icon {
+            background: rgba(166, 138, 255, 0.1);
+            color: var(--quantum-1);
+        }
+
+        .card.cosmic .card-icon {
+            background: rgba(255, 123, 229, 0.1);
+            color: var(--cosmic-1);
+        }
+
+        .card-content {
+            margin-bottom: 20px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .progress-container {
+            margin: 15px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(2, 6, 18, 0.65);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--fgme-1), var(--fgme-2));
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill.startigo {
+            background: linear-gradient(90deg, var(--startigo-1), var(--fgme-2));
+        }
+
+        .progress-fill.quantum {
+            background: linear-gradient(90deg, var(--quantum-1), var(--fgme-2));
+        }
+
+        .progress-fill.cosmic {
+            background: linear-gradient(90deg, var(--cosmic-1), var(--fgme-2));
+        }
+
+        .progress-fill::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.2) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.2) 75%,
+                transparent 75%,
+                transparent
+            );
+            z-index: 1;
+            background-size: 15px 15px;
+            animation: move 2s linear infinite;
+            border-radius: 5px;
+        }
+
+        @keyframes move {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 15px 15px;
+            }
+        }
+
+        .btn {
+            background: rgba(2, 6, 18, 0.7);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            border-color: var(--fgme-2);
+            box-shadow: 0 6px 18px rgba(5, 217, 232, 0.2), inset 0 0 8px rgba(5, 217, 232, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn.startigo:hover {
+            border-color: var(--startigo-1);
+            box-shadow: 0 6px 18px rgba(0, 224, 184, 0.2), inset 0 0 8px rgba(0, 224, 184, 0.1);
+        }
+
+        .btn.quantum:hover {
+            border-color: var(--quantum-1);
+            box-shadow: 0 6px 18px rgba(166, 138, 255, 0.2), inset 0 0 8px rgba(166, 138, 255, 0.1);
+        }
+
+        .btn.cosmic:hover {
+            border-color: var(--cosmic-1);
+            box-shadow: 0 6px 18px rgba(255, 123, 229, 0.2), inset 0 0 8px rgba(255, 123, 229, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--fgme-1), var(--fgme-2));
+            color: #051218;
+            border: none;
+        }
+
+        .btn-primary.startigo {
+            background: linear-gradient(90deg, var(--startigo-1), var(--fgme-2));
+        }
+
+        .btn-primary.quantum {
+            background: linear-gradient(90deg, var(--quantum-1), var(--fgme-2));
+        }
+
+        .btn-primary.cosmic {
+            background: linear-gradient(90deg, var(--cosmic-1), var(--fgme-2));
+        }
+
+        .log-container {
+            background: rgba(2, 6, 18, 0.65);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 30px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .log-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--fgme-2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-title.startigo {
+            color: var(--startigo-1);
+        }
+
+        .log-title.quantum {
+            color: var(--quantum-1);
+        }
+
+        .log-title.cosmic {
+            color: var(--cosmic-1);
+        }
+
+        .log-entry {
+            padding: 12px;
+            border-bottom: 1px solid rgba(21, 48, 86, 0.5);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .log-time {
+            color: var(--muted);
+            min-width: 90px;
+            font-size: 0.85rem;
+        }
+
+        .log-info {
+            color: var(--brand);
+        }
+
+        .log-warning {
+            color: var(--warn);
+        }
+
+        .log-error {
+            color: var(--err);
+        }
+
+        .log-success {
+            color: var(--ok);
+        }
+
+        .log-fgme {
+            color: var(--fgme-1);
+        }
+
+        .log-startigo {
+            color: var(--startigo-1);
+        }
+
+        .log-quantum {
+            color: var(--quantum-1);
+        }
+
+        .log-cosmic {
+            color: var(--cosmic-1);
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .service-item {
+            background: rgba(2, 6, 18, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .service-item:hover {
+            border-color: var(--fgme-2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(5, 217, 232, 0.2);
+        }
+
+        .service-item.startigo:hover {
+            border-color: var(--startigo-1);
+            box-shadow: 0 5px 15px rgba(0, 224, 184, 0.2);
+        }
+
+        .service-item.quantum:hover {
+            border-color: var(--quantum-1);
+            box-shadow: 0 5px 15px rgba(166, 138, 255, 0.2);
+        }
+
+        .service-item.cosmic:hover {
+            border-color: var(--cosmic-1);
+            box-shadow: 0 5px 15px rgba(255, 123, 229, 0.2);
+        }
+
+        .service-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--fgme-2);
+        }
+
+        .service-item.startigo .service-icon {
+            color: var(--startigo-1);
+        }
+
+        .service-item.quantum .service-icon {
+            color: var(--quantum-1);
+        }
+
+        .service-item.cosmic .service-icon {
+            color: var(--cosmic-1);
+        }
+
+        .service-name {
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+
+        .code-block {
+            background: rgba(2, 6, 18, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .protocol {
+            color: #7ee787;
+        }
+
+        .keyword {
+            color: #ff7b72;
+        }
+
+        .string {
+            color: #a5d6ff;
+        }
+
+        .comment {
+            color: #8b949e;
+        }
+
+        .number {
+            color: #d2a8ff;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tech-tag {
+            background: rgba(255, 42, 109, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .tech-tag.fgme {
+            background: rgba(255, 42, 109, 0.2);
+            border-color: var(--fgme-1);
+            color: var(--fgme-3);
+        }
+
+        .tech-tag.startigo {
+            background: rgba(0, 224, 184, 0.1);
+            border-color: var(--startigo-1);
+            color: var(--startigo-1);
+        }
+
+        .tech-tag.quantum {
+            background: rgba(166, 138, 255, 0.1);
+            border-color: var(--quantum-1);
+            color: var(--quantum-1);
+        }
+
+        .tech-tag.cosmic {
+            background: rgba(255, 123, 229, 0.1);
+            border-color: var(--cosmic-1);
+            color: var(--cosmic-1);
+        }
+
+        .immutable-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--fgme-1);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 20px;
+            box-shadow: 0 3px 10px rgba(255, 42, 109, 0.5);
+        }
+
+        .immutable-badge.startigo {
+            background: var(--startigo-1);
+            box-shadow: 0 3px 10px rgba(0, 224, 184, 0.5);
+        }
+
+        .immutable-badge.quantum {
+            background: var(--quantum-1);
+            box-shadow: 0 3px 10px rgba(166, 138, 255, 0.5);
+        }
+
+        .immutable-badge.cosmic {
+            background: var(--cosmic-1);
+            box-shadow: 0 3px 10px rgba(255, 123, 229, 0.5);
+        }
+
+        .antenna-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .antenna {
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(2, 6, 18, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        .antenna:hover {
+            border-color: var(--startigo-1);
+            background: rgba(0, 224, 184, 0.05);
+        }
+
+        .antenna strong {
+            font-size: 0.95rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            box-shadow: 0 0 8px rgba(0, 224, 184, 0.12);
+        }
+
+        .dot-good {
+            background: #00ffcf;
+        }
+
+        .dot-warn {
+            background: #ffb86b;
+        }
+
+        .dot-bad {
+            background: #ff6b6b;
+        }
+
+        .badge {
+            background: rgba(0, 224, 184, 0.06);
+            padding: 6px 8px;
+            border-radius: 6px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .panel-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .cfg {
+            background: #001617;
+            padding: 10px;
+            border-radius: 8px;
+            color: #cfeee6;
+            font-size: 0.85rem;
+            overflow: auto;
+            max-height: 180px;
+        }
+
+        .active-css {
+            animation: glow 1.6s infinite;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 6px rgba(0, 224, 184, 0.08); }
+            50% { box-shadow: 0 0 14px rgba(0, 224, 184, 0.18); }
+            100% { box-shadow: 0 0 6px rgba(0, 224, 184, 0.08); }
+        }
+
+        .blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.4; }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .service-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+
+        .phoenix-animation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            z-index: 100;
+            opacity: 0.9;
+            filter: drop-shadow(0 0 10px var(--fgme-1));
+        }
+
+        .phoenix-core {
+            position: absolute;
+            inset: 0;
+            background: conic-gradient(from 200deg, var(--fgme-1), var(--fgme-2), var(--brand), var(--startigo-1), var(--quantum-1), var(--cosmic-1));
+            border-radius: 55% 55% 50% 45% / 55% 45% 55% 45%;
+            transform: rotate(-35deg);
+            animation: corePulse 3.5s ease-in-out infinite;
+        }
+
+        .phoenix-core::after {
+            content: "";
+            position: absolute;
+            width: 46%;
+            height: 46%;
+            top: 22%;
+            left: 24%;
+            background: radial-gradient(circle at 50% 50%, #fff, var(--fgme-2) 40%, transparent 60%);
+            border-radius: 50%;
+            opacity: .7;
+            filter: blur(2px);
+        }
+
+        .wing {
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            top: 20%;
+            background: radial-gradient(circle at 30% 50%, var(--fgme-2), transparent 65%);
+            filter: blur(.4px);
+        }
+
+        .wing.left {
+            left: -12%;
+            transform: skewY(-12deg) rotate(-35deg);
+            clip-path: polygon(0 50%, 70% 0, 100% 50%, 70% 100%);
+        }
+
+        .wing.right {
+            right: -12%;
+            transform: scaleX(-1) skewY(-12deg) rotate(-35deg);
+            clip-path: polygon(0 50%, 70% 0, 100% 50%, 70% 100%);
+        }
+
+        .halo {
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            box-shadow: 0 0 28px 8px rgba(255, 42, 109, 0.25) inset, 0 0 42px rgba(5, 217, 232, 0.35);
+            animation: haloSpin 12s linear infinite;
+        }
+
+        @keyframes corePulse {
+            0%, 100% { transform: rotate(-35deg) scale(1); }
+            50% { transform: rotate(-35deg) scale(1.05); }
+        }
+
+        @keyframes haloSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .system-indicator {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(0, 224, 184, 0.1);
+            color: var(--startigo-1);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .system-indicator.quantum {
+            background: rgba(166, 138, 255, 0.1);
+            color: var(--quantum-1);
+        }
+
+        .system-indicator.cosmic {
+            background: rgba(255, 123, 229, 0.1);
+            color: var(--cosmic-1);
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: rgba(2, 6, 18, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover, .tab.active {
+            background: var(--fgme-1);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <h1 class="logo">Fénix Azulia</h1>
+            </div>
+            <p class="tagline">Sistema Integral Completo - FGME + StarTigo + Quantum + Cósmico - Operación autónoma sin intervención humana</p>
+            
+            <div class="system-selector">
+                <button class="system-btn fgme active" data-system="fgme">
+                    <i class="fas fa-infinity"></i> FGME
+                </button>
+                <button class="system-btn startigo" data-system="startigo">
+                    <i class="fas fa-satellite-dish"></i> StarTigo
+                </button>
+                <button class="system-btn quantum" data-system="quantum">
+                    <i class="fas fa-atom"></i> Quantum
+                </button>
+                <button class="system-btn cosmic" data-system="cosmic">
+                    <i class="fas fa-stars"></i> Cósmico
+                </button>
+            </div>
+            
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-label">Estado del Sistema</span>
+                    <span class="status-value status-online">
+                        <span class="status-pulse"></span>
+                        AUTÓNOMO
+                    </span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Bucles Activos</span>
+                    <span class="status-value" id="active-loops">16/16</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Tiempo ininterrumpido</span>
+                    <span class="status-value" id="uptime">00:00:00</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Inmutabilidad</span>
+                    <span class="status-value" id="immutability">100%</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Conexiones Activas</span>
+                    <span class="status-value" id="active-connections">12</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="tab-container">
+            <div class="tab active" data-tab="dashboard">Dashboard Principal</div>
+            <div class="tab" data-tab="antennas">Antenas y Conexiones</div>
+            <div class="tab" data-tab="quantum">Computación Cuántica</div>
+            <div class="tab" data-tab="cosmic">Sistema Cósmico</div>
+            <div class="tab" data-tab="security">Seguridad Integral</div>
+            <div class="tab" data-tab="config">Configuración</div>
+        </div>
+        
+        <div class="tab-content active" id="dashboard-tab">
+            <div class="dashboard">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-infinity"></i> Bucles Eternos FGME</h2>
+                        <div class="card-icon"><i class="fas fa-infinity"></i></div>
+                    </div>
+                    <div class="card-content">
+                        <p>Sistemas de procesamiento continuo con verificación inmutable.</p>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Ejecución continua</span>
+                                <span id="loop-progress">100%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="service-grid">
+                            <div class="service-item">
+                                <div class="immutable-badge">FGME</div>
+                                <div class="service-icon"><i class="fas fa-recycle"></i></div>
+                                <div class="service-name">Bucle Principal</div>
+                            </div>
+                            <div class="service-item">
+                                <div class="immutable-badge">FGME</div>
+                                <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+                                <div class="service-name">Seguridad</div>
+                            </div>
+                            <div class="service-item">
+                                <div class="immutable-badge">FGME</div>
+                                <div class="service-icon"><i class="fas fa-database"></i></div>
+                                <div class="service-name">Datos</div>
+                            </div>
+                            <div class="service-item">
+                                <div class="immutable-badge">FGME</div>
+                                <div class="service-icon"><i class="fas fa-code"></i></div>
+                                <div class="service-name">Código</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="status-online">ACTIVO</span>
+                        <button class="btn"><i class="fas fa-cog"></i> Monitor</button>
+                    </div>
+                </div>
+                
+                <div class="card startigo">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-satellite-dish"></i> StarTigo - Conexiones</h2>
+                        <div class="card-icon"><i class="fas fa-satellite-dish"></i></div>
+                    </div>
+                    <div class="card-content">
+                        <p>Sistema de antenas y conexiones inmutables con rotación automática.</p>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Conectividad</span>
+                                <span id="connectivity-progress">98%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill startigo" style="width: 98%"></div>
+                            </div>
+                        </div>
+                        <div class="service-grid">
+                            <div class="service-item startigo">
+                                <div class="immutable-badge startigo">StarTigo</div>
+                                <div class="service-icon"><i class="fas fa-wifi"></i></div>
+                                <div class="service-name">Conexiones</div>
+                            </div>
+                            <div class="service-item startigo">
+                                <div class="immutable-badge startigo">StarTigo</div>
+                                <div class="service-icon"><i class="fas fa-sync-alt"></i></div>
+                                <div class="service-name">Rotación IP</div>
+                            </div>
+                            <div class="service-item startigo">
+                                <div class="immutable-badge startigo">StarTigo</div>
+                                <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+                                <div class="service-name">Seguridad</div>
+                            </div>
+                            <div class="service-item startigo">
+                                <div class="immutable-badge startigo">StarTigo</div>
+                                <div class="service-icon"><i class="fas fa-broadcast-tower"></i></div>
+                                <div class="service-name">Antenas</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="status-online">CONECTADO</span>
+                        <button class="btn startigo"><i class="fas fa-network-wired"></i> Gestionar</button>
+                    </div>
+                </div>
+                
+                <div class="card quantum">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-atom"></i> Computación Cuántica</h2>
+                        <div class="card-icon"><i class="fas fa-atom"></i></div>
+                    </div>
+                    <div class="card-content">
+                        <p>Procesamiento cuántico con entrelazamiento y superposición.</p>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Procesamiento Cuántico</span>
+                                <span id="quantum-progress">87%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill quantum" style="width: 87%"></div>
+                            </div>
+                        </div>
+                        <div class="service-grid">
+                            <div class="service-item quantum">
+                                <div class="immutable-badge quantum">Quantum</div>
+                                <div class="service-icon"><i class="fas fa-microchip"></i></div>
+                                <div class="service-name">Qubits</div>
+                            </div>
+                            <div class="service-item quantum">
+                                <div class="immutable-badge quantum">Quantum</div>
+                                <div class="service-icon"><i class="fas fa-link"></i></div>
+                                <div class="service-name">Entrelazamiento</div>
+                            </div>
+                            <div class="service-item quantum">
+                                <div class="immutable-badge quantum">Quantum</div>
+                                <div class="service-icon"><i class="fas fa-layer-group"></i></div>
+                                <div class="service-name">Superposición</div>
+                            </div>
+                            <div class="service-item quantum">
+                                <div class="immutable-badge quantum">Quantum</div>
+                                <div class="service-icon"><i class="fas fa-lock"></i></div>
+                                <div class="service-name">Criptografía</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="status-online">ACTIVO</span>
+                        <button class="btn quantum"><i class="fas fa-atom"></i> Control</button>
+                    </div>
+                </div>
+                
+                <div class="card cosmic">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-stars"></i> Sistema Cósmico</h2>
+                        <div class="card-icon"><i class="fas fa-stars"></i></div>
+                    </div>
+                    <div class="card-content">
+                        <p>Conectividad cósmica y procesamiento estelar.</p>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Conexión Cósmica</span>
+                                <span id="cosmic-progress">92%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill cosmic" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div class="service-grid">
+                            <div class="service-item cosmic">
+                                <div class="immutable-badge cosmic">Cósmico</div>
+                                <div class="service-icon"><i class="fas fa-satellite"></i></div>
+                                <div class="service-name">Satélites</div>
+                            </div>
+                            <div class="service-item cosmic">
+                                <div class="immutable-badge cosmic">Cósmico</div>
+                                <div class="service-icon"><i class="fas fa-globe-americas"></i></div>
+                                <div class="service-name">Planetario</div>
+                            </div>
+                            <div class="service-item cosmic">
+                                <div class="immutable-badge cosmic">Cósmico</div>
+                                <div class="service-icon"><i class="fas fa-meteor"></i></div>
+                                <div class="service-name">Estelar</div>
+                            </div>
+                            <div class="service-item cosmic">
+                                <div class="immutable-badge cosmic">Cósmico</div>
+                                <div class="service-icon"><i class="fas fa-user-astronaut"></i></div>
+                                <div class="service-name">Exploración</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="status-online">CONECTADO</span>
+                        <button class="btn cosmic"><i class="fas fa-rocket"></i> Navegar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="log-container">
+            <h3 class="log-title"><i class="fas fa-list-alt"></i> Registro de Actividad - Sistema Integral</h3>
+            <div id="system-log">
+                <div class="log-entry">
+                    <span class="log-time">[12:45:30]</span>
+                    <i class="fas fa-play-circle log-fgme"></i>
+                    <span class="log-fgme">Sistema Integral FGME + StarTigo + Quantum + Cósmico iniciado</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">[12:45:32]</span>
+                    <i class="fas fa-infinity log-success"></i>
+                    <span class="log-success">Bucles eternos inicializados - Operación continua</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">[12:46:15]</span>
+                    <i class="fas fa-satellite-dish log-startigo"></i>
+                    <span class="log-startigo">Sistema StarTigo conectado - Antenas detectadas: 8</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">[12:47:22]</span>
+                    <i class="fas fa-atom log-quantum"></i>
+                    <span class="log-quantum">Computación cuántica activada - 256 Qubits inicializados</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">[12:48:05]</span>
+                    <i class="fas fa-stars log-cosmic"></i>
+                    <span class="log-cosmic">Sistema cósmico conectado - Satélites sincronizados</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">[12:49:17]</span>
+                    <i class="fas fa-check-double log-success"></i>
+                    <span class="log-success">Verificación de inmutabilidad completada - Sin cambios detectados</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <span class="comment">// SISTEMA INTEGRAL - Código de inicialización completo</span><br>
+            <span class="keyword">function</span> <span class="protocol">initCompleteSystem</span>() {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Inicializar todos los sistemas</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> fgmeSystem = <span class="keyword">new</span> <span class="protocol">FGMESystem</span>();<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> startigoSystem = <span class="keyword">new</span> <span class="protocol">StarTigoSystem</span>();<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> quantumSystem = <span class="keyword">new</span> <span class="protocol">QuantumSystem</span>();<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> cosmicSystem = <span class="keyword">new</span> <span class="protocol">CosmicSystem</span>();<br><br>
+            
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Configurar autonomía completa</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;fgmeSystem.setAutonomyLevel(<span class="protocol">AUTONOMY_FULL</span>);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;startigoSystem.setAutonomyLevel(<span class="protocol">AUTONOMY_FULL</span>);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;quantumSystem.setAutonomyLevel(<span class="protocol">AUTONOMY_FULL</span>);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;cosmicSystem.setAutonomyLevel(<span class="protocol">AUTONOMY_FULL</span>);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;fgmeSystem.setHumanIntervention(<span class="keyword">false</span>);<br><br>
+            
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Iniciar bucles eternos para todos los sistemas</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;fgmeSystem.startEternalLoops();<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;startigoSystem.startEternalLoops();<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;quantumSystem.startEternalLoops();<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;cosmicSystem.startEternalLoops();<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="string">"Sistema integral iniciado con éxito"</span>;<br>
+            }
+        </div>
+    </div>
+    
+    <div class="phoenix-animation">
+        <div class="phoenix-core"></div>
+        <div class="wing left"></div>
+        <div class="wing right"></div>
+        <div class="halo"></div>
+    </div>
+
+    <div class="footer">
+        Sistema Fénix Azulia Integral Completo © 2023 - Integrando FGME, StarTigo, Quantum y Sistemas Cósmicos
+    </div>
+
+    <script>
+        // Simulación del Sistema Integral Completo
+        document.addEventListener('DOMContentLoaded', function() {
+            const systemStatus = document.getElementById('system-status');
+            const activeLoops = document.getElementById('active-loops');
+            const uptimeElement = document.getElementById('uptime');
+            const immutabilityElement = document.getElementById('immutability');
+            const activeConnections = document.getElementById('active-connections');
+            const systemLog = document.getElementById('system-log');
+            
+            let startTime = new Date();
+            let loopCount = 16;
+            let immutabilityLevel = 100;
+            let connectionCount = 12;
+            
+            // Configurar tabs
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Desactivar todas las tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    
+                    // Activar la tab seleccionada
+                    tab.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Configurar selectores de sistema
+            const systemButtons = document.querySelectorAll('.system-btn');
+            
+            systemButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const system = button.getAttribute('data-system');
+                    
+                    // Desactivar todos los botones
+                    systemButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Activar el botón seleccionado
+                    button.classList.add('active');
+                    
+                    // Aquí iría la lógica para cambiar entre sistemas
+                    addLogEntry(`Sistema ${system.toUpperCase()} activado`, 'info', `fa-${system === 'fgme' ? 'infinity' : system === 'startigo' ? 'satellite-dish' : system === 'quantum' ? 'atom' : 'stars'}`);
+                });
+            });
+            
+            // Actualizar el tiempo de actividad
+            function updateUptime() {
+                const now = new Date();
+                const diff = now - startTime;
+                
+                const hours = Math.floor(diff / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                
+                uptimeElement.textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            // Agregar entrada al registro del sistema
+            function addLogEntry(message, type = 'info', icon = 'fa-info-circle') {
+                const now = new Date();
+                const timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+                
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'log-time';
+                timeSpan.textContent = timeString;
+                
+                const iconElement = document.createElement('i');
+                iconElement.className = `fas ${icon} log-${type}`;
+                
+                const messageSpan = document.createElement('span');
+                messageSpan.className = `log-${type}`;
+                messageSpan.textContent = message;
+                
+                logEntry.appendChild(timeSpan);
+                logEntry.appendChild(iconElement);
+                logEntry.appendChild(messageSpan);
+                
+                systemLog.appendChild(logEntry);
+                systemLog.scrollTop = systemLog.scrollHeight;
+                
+                // Mantener solo las últimas 50 entradas
+                if (systemLog.children.length > 50) {
+                    systemLog.removeChild(systemLog.firstChild);
+                }
+            }
+            
+            // Simular actividad del sistema integral
+            function simulateSystemActivity() {
+                // Cambiar aleatoriamente los valores de los bucles
+                document.getElementById('loop-progress').textContent = `${Math.floor(95 + Math.random() * 5)}%`;
+                document.getElementById('loop-progress').parentElement.nextElementSibling.firstElementChild.style.width = 
+                    document.getElementById('loop-progress').textContent;
+                
+                document.getElementById('connectivity-progress').textContent = `${Math.floor(95 + Math.random() * 4)}%`;
+                document.getElementById('connectivity-progress').parentElement.nextElementSibling.firstElementChild.style.width = 
+                    document.getElementById('connectivity-progress').textContent;
+                
+                document.getElementById('quantum-progress').textContent = `${Math.floor(80 + Math.random() * 15)}%`;
+                document.getElementById('quantum-progress').parentElement.nextElementSibling.firstElementChild.style.width = 
+                    document.getElementById('quantum-progress').textContent;
+                
+                document.getElementById('cosmic-progress').textContent = `${Math.floor(85 + Math.random() * 12)}%`;
+                document.getElementById('cosmic-progress').parentElement.nextElementSibling.firstElementChild.style.width = 
+                    document.getElementById('cosmic-progress').textContent;
+                
+                // Simular eventos aleatorios
+                if (Math.random() > 0.7) {
+                    const events = [
+                        {msg: "Procesamiento de datos completado", type: "info", icon: "fa-database"},
+                        {msg: "Conexión segura establecida", type: "success", icon: "fa-lock"},
+                        {msg: "Consulta cuántica ejecutada", type: "quantum", icon: "fa-atom"},
+                        {msg: "Datos cósmicos recibidos", type: "cosmic", icon: "fa-stars"},
+                        {msg: "Backup automático completado", type: "success", icon: "fa-history"},
+                        {msg: "Intento de acceso no autorizado bloqueado", type: "warning", icon: "fa-shield-alt"},
+                        {msg: "Sincronización con satélites completada", type: "cosmic", icon: "fa-satellite"},
+                        {msg: "API REST respondiendo correctamente", type: "info", icon: "fa-code"}
+                    ];
+                    
+                    const event = events[Math.floor(Math.random() * events.length)];
+                    addLogEntry(event.msg, event.type, event.icon);
+                }
+                
+                // Simular cambio en conexiones
+                const connectionChange = (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 3);
+                connectionCount = Math.max(5, Math.min(20, connectionCount + connectionChange));
+                activeConnections.textContent = connectionCount;
+                
+                // Simular cambio en bucles activos
+                if (Math.random() > 0.95) {
+                    loopCount = Math.max(12, Math.min(20, loopCount + (Math.random() > 0.5 ? 1 : -1)));
+                    activeLoops.textContent = `${loopCount}/20`;
+                }
+            }
+            
+            // Iniciar simulaciones
+            setInterval(updateUptime, 1000);
+            setInterval(simulateSystemActivity, 3000);
+            
+            // Mensaje inicial
+            addLogEntry("Sistema Integral FGME + StarTigo + Quantum + Cósmico iniciado", "success", "fa-play-circle");
+            addLogEntry("Todos los sistemas cargados correctamente", "success", "fa-check-circle");
+            addLogEntry("Monitoreo de seguridad activado", "success", "fa-shield-alt");
+            addLogEntry("Bucles eternos inicializados para todos los sistemas", "info", "fa-infinity");
+        });
+    </script>
+</body>
+</html>
