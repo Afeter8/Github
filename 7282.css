@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FGME — Snapshot Inmutable & Regeneración</title>
+<style>
+  :root{
+    --bg:#041426; --card:#072043; --text:#e6f6ff;
+    --blue1:linear-gradient(180deg,#0b6bff,#0050d4);
+    --neon:linear-gradient(90deg,#00f0ff,#0088ff);
+  }
+  body{margin:0; font-family:Inter,ui-sans-serif,system-ui; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased;}
+  header{padding:24px; display:flex; align-items:center; gap:18px}
+  h1{margin:0;font-size:20px}
+  .container{padding:24px; display:grid; gap:18px; grid-template-columns: 420px 1fr;}
+  .card{background:var(--card); border-radius:12px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,.6)}
+  .uploader{border:2px dashed rgba(255,255,255,0.06); padding:18px; border-radius:10px; text-align:center}
+  input[type=file]{display:none}
+  .files {max-height:420px; overflow:auto; margin-top:12px;}
+  .file-row{display:flex;gap:8px; align-items:center; padding:8px;border-radius:8px; background:rgba(255,255,255,0.01); margin-bottom:8px}
+  .file-name{flex:1; font-size:13px}
+  .hash{font-family:monospace; font-size:12px; color:#9fd};
+  .btn{border:0; cursor:pointer; padding:12px 18px; border-radius:10px; color:white; font-weight:700; margin-right:8px}
+  .btn-blue{background:var(--blue1); box-shadow:0 10px 30px rgba(11,107,255,.12)}
+  .btn-neon{background:var(--neon); box-shadow:0 0 22px rgba(0,240,255,.22), inset 0 -2px 8px rgba(255,255,255,0.06)}
+  .controls{display:flex; gap:8px; flex-wrap:wrap}
+  .small{font-size:12px; color:#9ec; margin-top:6px}
+  pre {white-space:pre-wrap; font-size:12px; color:#dff; background:rgba(0,0,0,0.12); padding:10px; border-radius:8px; overflow:auto}
+  footer{padding:16px; text-align:center; color:#8fa}
+  .badge{background:#012034;padding:6px 10px;border-radius:8px;font-size:12px}
+  .muted{color:#8aa}
+  label.option{display:block;margin-top:8px}
+  select,input[type=checkbox]{margin-left:8px}
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;flex-direction:column">
+    <h1>FGME — Snapshot Inmutable & Regeneración</h1>
+    <div class="muted">Sube archivos, genera manifest inmutable, firma y exporta snapshot.</div>
+  </div>
+  <div style="margin-left:auto" class="badge">FGME Ultimate · Snapshot único</div>
+</header>
+
+<div class="container">
+  <!-- Left column -->
+  <div>
+    <div class="card">
+      <div class="uploader" id="dropzone">
+        <strong>Arrastra y suelta archivos aquí</strong><br/>
+        <small class="muted">o <label style="color:#9fd; cursor:pointer"><input type="file" id="fileInput" multiple/> seleccionar archivos</label></small>
+        <div class="small">Soporta texto y binarios. Respeta privacidad — todo opera localmente.</div>
+      </div>
+
+      <div class="files" id="fileList"></div>
+
+      <div style="margin-top:12px">
+        <div class="controls">
+          <button class="btn btn-blue" id="btnHash">Calcular Hash & Merkle</button>
+          <button class="btn btn-neon" id="btnGenKey">Generar Par de Claves (ECDSA P-256)</button>
+          <button class="btn btn-blue" id="btnSign">Firmar Manifest</button>
+          <button class="btn btn-neon" id="btnExport">Exportar Snapshot (.fgme.json)</button>
+        </div>
+        <div class="small">Opciones: <label class="option"><input type="checkbox" id="optFreeze"> Freeze UI después de exportar</label></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Regeneración / Rotación de código</h3>
+      <div class="small">Normalizar y minificar de forma determinista. Mantiene fichero original en snapshot.</div>
+      <label class="option">Acción:
+        <select id="regenAction">
+          <option value="normalize">Normalizar (tabs → espacios, trim, colapsar líneas)</option>
+          <option value="minify">Minify básico (elimina comentarios/espacios)</option>
+        </select>
+      </label>
+      <div style="margin-top:8px" class="controls">
+        <button class="btn btn-blue" id="btnRegen">Generar Versión Rotativa</button>
+        <button class="btn btn-neon" id="btnExportRot">Exportar Snapshot Rotado</button>
+      </div>
+      <div class="small">Puedes crear tantas rotaciones como quieras; cada una produce un snapshot firmado distinto.</div>
+    </div>
+
+  </div>
+
+  <!-- Right column -->
+  <div>
+    <div class="card">
+      <h3>Estado & Manifest</h3>
+      <div id="status"><span class="muted">Esperando archivos...</span></div>
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.04);margin:12px 0">
+      <div><strong>Merkle Root:</strong> <span id="merkleRoot" class="hash">-</span></div>
+      <div><strong>Manifest Hash:</strong> <span id="manifestHash" class="hash">-</span></div>
+      <div><strong>Firma:</strong> <span id="signature" class="hash">-</span></div>
+      <div style="margin-top:12px"><strong>Llave pública (JWK):</strong>
+        <pre id="pubkey" style="max-height:140px">-</pre>
+      </div>
+      <div style="margin-top:8px">
+        <button class="btn btn-blue" id="btnLoad">Cargar Snapshot (.fgme.json)</button>
+        <input type="file" id="loadInput" accept=".fgme.json" style="display:none"/>
+        <button class="btn btn-neon" id="btnVerify">Verificar Snapshot Cargado</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Preview / Logs</h3>
+      <pre id="log" style="height:300px">Logs del sistema aparecerán aquí...</pre>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Hecho para FGME · Operación local · Guarda tus claves en HSM / Vault para producción.
+</footer>
+
+<script>
+(async()=>{
+
+/* -----------------------
+   Utilidades criptográficas
+   ----------------------- */
+async function sha256Hex(buf){
+  const h = await crypto.subtle.digest('SHA-256', buf instanceof Uint8Array ? buf : new TextEncoder().encode(buf));
+  return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function arrayBufferToBase64(buf){
+  let binary = '';
+  const bytes = new Uint8Array(buf);
+  const chunk = 0x8000;
+  for (let i=0;i<bytes.length;i+=chunk){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+  }
+  return btoa(binary);
+}
+function base64ToArrayBuffer(b64){
+  const binary = atob(b64);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i=0;i<len;i++) bytes[i]=binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+/* -----------------------
+   Estado
+   ----------------------- */
+const files = []; // {name, type, arrayBuffer, text?, hash}
+const ui = {
+  fileList: document.getElementById('fileList'),
+  log: document.getElementById('log'),
+  status: document.getElementById('status'),
+  merkleRoot: document.getElementById('merkleRoot'),
+  manifestHash: document.getElementById('manifestHash'),
+  signature: document.getElementById('signature'),
+  pubkey: document.getElementById('pubkey'),
+};
+
+function log(msg){ const now = new Date().toISOString().replace('T',' ').split('.')[0]; ui.log.textContent = `${now}  ${msg}\n` + ui.log.textContent; }
+
+/* -----------------------
+   File handling
+   ----------------------- */
+const drop = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+drop.addEventListener('dragover',e=>{ e.preventDefault(); drop.style.borderColor='#0b6bff' });
+drop.addEventListener('dragleave',e=>{ drop.style.borderColor='rgba(255,255,255,0.06)' });
+drop.addEventListener('drop',async e=>{ e.preventDefault(); drop.style.borderColor='rgba(255,255,255,0.06)'; await handleFiles(e.dataTransfer.files) });
+fileInput.addEventListener('change', async e=> await handleFiles(e.target.files));
+
+async function handleFiles(list){
+  for (const f of list){
+    const ab = await f.arrayBuffer();
+    const isText = /^text\/|application\/(javascript|json)|.*(xml|html|xhtml|ecmascript)/.test(f.type) || /\.(py|js|java|c|cpp|h|html|css|json|xml)$/.test(f.name);
+    const text = isText ? await (new Response(ab).text()) : null;
+    const h = await sha256Hex(ab);
+    files.push({name:f.name, type:f.type, arrayBuffer:ab, text, hash:h});
+    renderFiles();
+    log(`Añadido ${f.name} (${f.type||'bin'}) hash=${h}`);
+  }
+  ui.status.innerHTML = `<span class="muted">${files.length} archivos listos</span>`;
+}
+
+/* -----------------------
+  Render file list
+   ----------------------- */
+function renderFiles(){
+  ui.fileList.innerHTML = '';
+  for (const f of files){
+    const row = document.createElement('div'); row.className='file-row';
+    row.innerHTML = `<div class="file-name">${escapeHtml(f.name)}</div><div style="width:220px"><div class="hash">${f.hash}</div></div><div><button class="btn" style="background:#233" data-name="${f.name}">Eliminar</button></div>`;
+    ui.fileList.appendChild(row);
+    row.querySelector('button').addEventListener('click', ()=>{ const idx = files.findIndex(x=>x.name===f.name); if(idx>=0) files.splice(idx,1); renderFiles(); log(`Eliminado ${f.name}`); });
+  }
+}
+
+/* -----------------------
+  Merkle root (simple)
+   ----------------------- */
+async function computeMerkleRoot(){
+  if(files.length===0) return null;
+  // leaves = SHA256 hex decodes
+  let leaves = await Promise.all(files.map(f=> sha256Hex(f.arrayBuffer).then(h=>h)));
+  // treat hex strings as bytes
+  function hexToBytes(hex){ const res=new Uint8Array(hex.length/2); for(let i=0;i<res.length;i++) res[i]=parseInt(hex.substr(i*2,2),16); return res;}
+  let nodes = leaves.map(h=> hexToBytes(h));
+  while(nodes.length>1){
+    const next = [];
+    for(let i=0;i<nodes.length;i+=2){
+      if(i+1===nodes.length){ next.push(nodes[i]); }
+      else {
+        const concat = new Uint8Array(nodes[i].length + nodes[i+1].length);
+        concat.set(nodes[i],0); concat.set(nodes[i+1], nodes[i].length);
+        const hbuf = await crypto.subtle.digest('SHA-256', concat);
+        next.push(new Uint8Array(hbuf));
+      }
+    }
+    nodes = next;
+  }
+  const rootHex = Array.from(nodes[0]).map(b=>b.toString(16).padStart(2,'0')).join('');
+  return rootHex;
+}
+
+/* -----------------------
+  Manifest & signing
+   ----------------------- */
+let keyPair = null; // CryptoKey pair
+async function genKeyPair(){
+  keyPair = await crypto.subtle.generateKey({name:'ECDSA', namedCurve:'P-256'}, true, ['sign','verify']);
+  const jwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+  ui.pubkey.textContent = JSON.stringify(jwk, null, 2);
+  log('Par de claves generado (ECDSA P-256). Guarda la clave privada en HSM/Vault para producción.');
+}
+
+async function importPrivateKeyJWK(jwk){
+  keyPair = { private: await crypto.subtle.importKey('jwk', jwk, {name:'ECDSA', namedCurve:'P-256'}, true, ['sign']), public: null};
+  log('Clave privada importada (no disponible pública). Use con precaución.');
+}
+
+async function signManifest(manifestJson){
+  if(!keyPair) return null;
+  // ensure we have private key, and export public key for record
+  if(!keyPair.private || !keyPair.public){
+    // if generated locally keyPair contains private AND public in same object; handle both
+    if(keyPair.private && keyPair.public) {/*ok*/}
+  }
+  // we'll export public if available
+  if(!keyPair.public){
+    try{ keyPair.public = await crypto.subtle.importKey('jwk', await crypto.subtle.exportKey('jwk', await crypto.subtle.exportKey('jwk', keyPair.private)), {name:'ECDSA', namedCurve:'P-256'}, true, ['verify']); }catch(e){}
+  }
+  const enc = new TextEncoder();
+  const data = enc.encode(manifestJson);
+  const sig = await crypto.subtle.sign({name:'ECDSA', hash:{name:'SHA-256'}}, keyPair.private, data);
+  return sig;
+}
+
+/* -----------------------
+  Export snapshot (fgme.json)
+   ----------------------- */
+async function buildManifest(){
+  const timestamp = new Date().toISOString();
+  const fileEntries = [];
+  for (const f of files){
+    fileEntries.push({
+      name: f.name,
+      type: f.type || 'application/octet-stream',
+      size: f.arrayBuffer.byteLength,
+      hash: f.hash
+    });
+  }
+  const merkle = await computeMerkleRoot();
+  const manifest = { created: timestamp, count: files.length, merkleRoot: merkle, files: fileEntries };
+  return manifest;
+}
+
+async function exportSnapshot(freezeAfter=false, filename='fgme_snapshot.fgme.json'){
+  const manifest = await buildManifest();
+  ui.merkleRoot.textContent = manifest.merkleRoot || '-';
+  const manifestStr = JSON.stringify(manifest, null, 2);
+  const sigBuf = await signManifest(manifestStr);
+  const signatureB64 = sigBuf ? await arrayBufferToBase64(sigBuf) : null;
+  let pubJwk = null;
+  try { pubJwk = keyPair ? await crypto.subtle.exportKey('jwk', keyPair.publicKey ? keyPair.publicKey : keyPair.public ) : null; } catch(e){}
+  const payload = {
+    manifest,
+    signature: signatureB64,
+    publicKey: pubJwk,
+    createdBy: "Fernando Guadalupe Mendez Espinoza",
+    files: await Promise.all(files.map(async f=> ({
+      name:f.name, type:f.type, encoding: 'base64', content: await arrayBufferToBase64(f.arrayBuffer), hash: f.hash
+    })))
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  ui.manifestHash.textContent = await sha256Hex(new TextEncoder().encode(JSON.stringify(manifest)));
+  ui.signature.textContent = signatureB64 ? signatureB64.slice(0,20)+'...':''; 
+  log(`Snapshot exportado (${filename}). ManifestHash=${ui.manifestHash.textContent}`);
+  if(freezeAfter){ document.getElementById('optFreeze').checked = true; freezeUI(); }
+}
+
+/* -----------------------
+  Verify snapshot
+   ----------------------- */
+document.getElementById('btnLoad').addEventListener('click', ()=> document.getElementById('loadInput').click());
+document.getElementById('loadInput').addEventListener('change', async e=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const txt = await f.text();
+  try{
+    const obj = JSON.parse(txt);
+    window._loadedSnapshot = obj;
+    log(`Snapshot cargado: ${f.name} (${obj.manifest.count} archivos)`);
+    ui.merkleRoot.textContent = obj.manifest.merkleRoot || '-';
+    ui.manifestHash.textContent = await sha256Hex(new TextEncoder().encode(JSON.stringify(obj.manifest)));
+    ui.pubkey.textContent = obj.publicKey ? JSON.stringify(obj.publicKey,null,2) : '-';
+    ui.signature.textContent = obj.signature ? obj.signature.slice(0,20)+'...' : '-';
+  }catch(ex){ log('Error parseando snapshot: '+ex) }
+});
+
+async function verifyLoaded(){
+  const obj = window._loadedSnapshot;
+  if(!obj) { alert('Carga antes un snapshot (.fgme.json)'); return; }
+  // recompute hashes of embedded files and recompute merkle
+  const embedded = obj.files || [];
+  const recomputed = [];
+  for (const f of embedded){
+    const ab = base64ToArrayBuffer(f.content);
+    const h = await sha256Hex(ab);
+    recomputed.push(h);
+    if(h !== f.hash){ log(`¡Mismatch hash! ${f.name}`); alert('Hashes no coinciden: snapshot corrupto'); return; }
+  }
+  // compute merkle
+  function hexToBytes(hex){ const res=new Uint8Array(hex.length/2); for(let i=0;i<res.length;i++) res[i]=parseInt(hex.substr(i*2,2),16); return res;}
+  let nodes = recomputed.map(h=>hexToBytes(h));
+  while(nodes.length>1){
+    const next = [];
+    for(let i=0;i<nodes.length;i+=2){
+      if(i+1===nodes.length) next.push(nodes[i]);
+      else {
+        const concat = new Uint8Array(nodes[i].length + nodes[i+1].length);
+        concat.set(nodes[i],0); concat.set(nodes[i+1], nodes[i].length);
+        const hbuf = await crypto.subtle.digest('SHA-256', concat);
+        next.push(new Uint8Array(hbuf));
+      }
+    }
+    nodes = next;
+  }
+  const rootHex = Array.from(nodes[0]).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(rootHex !== obj.manifest.merkleRoot){ log('Merkle mismatch!'); alert('Merkle root no coincide'); return; }
+  // verify signature if publicKey and signature present
+  if(obj.publicKey && obj.signature){
+    const pub = await crypto.subtle.importKey('jwk', obj.publicKey, {name:'ECDSA', namedCurve:'P-256'}, true, ['verify']);
+    const sigBuf = base64ToArrayBuffer(obj.signature);
+    const ok = await crypto.subtle.verify({name:'ECDSA', hash:{name:'SHA-256'}}, pub, sigBuf, new TextEncoder().encode(JSON.stringify(obj.manifest)));
+    if(!ok){ log('Firma inválida'); alert('Firma inválida'); return; }
+  }
+  log('Snapshot verificado OK. Integridad y firma correctas.');
+  alert('Snapshot verificado OK');
+}
+
+/* -----------------------
+  Regeneración / Rotación
+   ----------------------- */
+function normalizeText(txt){
+  // tabs -> 2 spaces, trim ends per line, collapse >2 blank lines into 2
+  let lines = txt.replace(/\r\n/g,'\n').split('\n').map(l=> l.replace(/\t/g,'  ').replace(/[ \t]+$/,''));
+  // collapse
+  let out=[]; let blank=0;
+  for(const L of lines){
+    if(L.trim()===''){ blank++; if(blank<=2) out.push(''); } else { blank=0; out.push(L); }
+  }
+  return out.join('\n').trimStart();
+}
+function minifyBasic(txt, name){
+  // very naive: remove JS/CSS/HTML comments and extra spaces
+  let t = txt;
+  if(/\.(js|py|java|c|cpp|h)$/.test(name) || /application\/javascript/.test(name) || name.endsWith('.css')){
+    // remove // comments
+    t = t.replace(/\/\/.*$/mg,'');
+    // remove /* */ comments
+    t = t.replace(/\/\*[\s\S]*?\*\//g,'');
+  }
+  if(name.endsWith('.html') || name.endsWith('.htm')){
+    // remove <!-- --> comments
+    t = t.replace(/<!--[\s\S]*?-->/g,'');
+  }
+  // collapse multiple spaces
+  t = t.replace(/[ \t]{2,}/g,' ');
+  // remove blank lines
+  t = t.replace(/^\s*[\r\n]/gm,'');
+  return t.trim();
+}
+
+async function regenAll(action){
+  if(files.length===0){ alert('No hay archivos cargados'); return; }
+  const rotated = [];
+  for(const f of files){
+    if(f.text != null){
+      const originalText = f.text;
+      let newText = originalText;
+      if(action==='normalize') newText = normalizeText(originalText);
+      else if(action==='minify') newText = minifyBasic(originalText, f.name);
+      const ab = new TextEncoder().encode(newText).buffer;
+      const h = await sha256Hex(ab);
+      rotated.push({name:f.name, type:f.type, arrayBuffer:ab, text:newText, hash:h, originalHash: f.hash});
+    } else {
+      // binary left unchanged, copy bytes
+      rotated.push({...f});
+    }
+  }
+  // replace files with rotated for export only — keep originals in memory too
+  window._rotatedFiles = rotated;
+  log(`Generada rotación (${action}) con ${rotated.length} archivos. Puedes exportar snapshot rotado.`);
+  alert('Rotación generada — usa "Exportar Snapshot Rotado" para descargarla.');
+}
+
+/* -----------------------
+  Freeze UI
+   ----------------------- */
+function freezeUI(){
+  document.getElementById('dropzone').style.pointerEvents='none';
+  fileInput.disabled=true;
+  document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  log('UI congelada (modo freeze). Para producción asegure claves en HSM y snapshots en storage inmutable.');
+}
+
+/* -----------------------
+  Event binding
+   ----------------------- */
+document.getElementById('btnHash').addEventListener('click', async ()=>{
+  ui.status.textContent = 'Calculando merkle...';
+  const merkle = await computeMerkleRoot();
+  ui.merkleRoot.textContent = merkle || '-';
+  ui.manifestHash.textContent = await sha256Hex(new TextEncoder().encode(JSON.stringify(await buildManifest())));
+  log('Merkle root calculado: '+(merkle||'-'));
+});
+
+document.getElementById('btnGenKey').addEventListener('click', async ()=>{ await genKeyPair(); });
+
+document.getElementById('btnSign').addEventListener('click', async ()=>{
+  const manifest = await buildManifest();
+  const s = await signManifest(JSON.stringify(manifest));
+  if(!s){ alert('No hay clave privada (genera una)'); return; }
+  const b64 = await arrayBufferToBase64(s);
+  ui.signature.textContent = b64.slice(0,20)+'...';
+  ui.manifestHash.textContent = await sha256Hex(new TextEncoder().encode(JSON.stringify(manifest)));
+  log('Manifest firmado localmente. Firma (preview): '+ui.signature.textContent);
+});
+
+document.getElementById('btnExport').addEventListener('click', async ()=>{
+  await exportSnapshot(document.getElementById('optFreeze').checked, 'fgme_snapshot.fgme.json');
+});
+
+document.getElementById('btnRegen').addEventListener('click', async ()=>{
+  const action = document.getElementById('regenAction').value;
+  await regenAll(action);
+});
+
+document.getElementById('btnExportRot').addEventListener('click', async ()=>{
+  if(!window._rotatedFiles){ alert('Genera una rotación primero'); return; }
+  // export rotated snapshot
+  const prevFiles = files.slice(); // keep originals
+  // temporarily swap
+  const saved = files.splice(0, files.length, ...window._rotatedFiles);
+  await exportSnapshot(false, 'fgme_rotated_snapshot.fgme.json');
+  // restore originals
+  files.splice(0, files.length, ...prevFiles);
+  renderFiles();
+});
+
+document.getElementById('btnVerify').addEventListener('click', verifyLoaded);
+
+/* -----------------------
+  Helpers
+   ----------------------- */
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+
+log('Interfaz lista. Arrastra archivos para empezar.');
+
+})(); // end IIFE
+</script>
+</body>
+</html>
