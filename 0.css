@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FGME — Control de Congelación Seguro (UI Local)</title>
+<style>
+  :root{
+    --bg:#031428; --card:#072043; --txt:#e6f6ff;
+    --blue:#0b6bff; --blue-dark:#0050d4;
+    --neon-1:#00f0ff; --neon-2:#0088ff;
+    --btn-radius:12px;
+  }
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto; background:var(--bg); color:var(--txt); -webkit-font-smoothing:antialiased;}
+  header{display:flex;align-items:center;padding:18px 24px;border-bottom:1px solid rgba(255,255,255,0.03)}
+  h1{margin:0;font-size:18px}
+  .sub{color:#9ec; font-size:13px}
+  .container{display:grid; grid-template-columns:360px 1fr; gap:18px; padding:20px}
+  .card{background:var(--card);border-radius:12px;padding:16px; box-shadow:0 8px 30px rgba(0,0,0,0.6);}
+  .controls{display:flex; gap:10px; flex-wrap:wrap}
+  .btn{border:0; cursor:pointer; padding:12px 18px; border-radius:var(--btn-radius); color:white; font-weight:700; font-size:13px}
+  .btn-blue{background:linear-gradient(180deg,var(--blue),var(--blue-dark)); box-shadow:0 12px 30px rgba(11,107,255,0.12)}
+  .btn-neon{background:linear-gradient(90deg,var(--neon-1),var(--neon-2)); box-shadow:0 0 22px rgba(0,240,255,0.22), inset 0 -2px 8px rgba(255,255,255,0.06)}
+  .muted{color:#8aa; font-size:13px}
+  label{display:block; margin-top:10px; font-size:13px}
+  input[type=text], select, textarea { width:100%; padding:8px; margin-top:6px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:var(--txt) }
+  .status{font-family:monospace;background:rgba(255,255,255,0.02); padding:10px;border-radius:8px; color:#9fd}
+  pre{white-space:pre-wrap; color:#dff; background:rgba(0,0,0,0.12); padding:12px; border-radius:8px; max-height:260px; overflow:auto}
+  footer{padding:12px;color:#8fa;text-align:center}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#012034;color:#9fd;font-size:12px}
+  .row{display:flex;gap:10px;align-items:center}
+  .switch{display:inline-flex;align-items:center;gap:8px}
+  .log{height:180px;overflow:auto;padding:8px;border-radius:8px;background:rgba(0,0,0,0.12)}
+  .danger{background:linear-gradient(180deg,#8f2e2e,#6b1f1f); color:white;}
+  small.note{color:#9aa; display:block; margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>FGME — Control de Congelación Seguro</h1>
+    <div class="sub">Genera paquetes firmados inmutables para bloqueo/congelación. Operación local. Integrar con backend seguro para aplicar.</div>
+  </div>
+  <div style="margin-left:auto">
+    <span class="pill">Modo: <strong id="modeLabel">Seguro (recommended)</strong></span>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Left column: controls -->
+  <div>
+    <div class="card">
+      <h3>Acciones principales</h3>
+      <div class="controls" style="margin-top:12px">
+        <button class="btn btn-blue" id="btnGenPkg">Generar Paquete de Congelación</button>
+        <button class="btn btn-neon" id="btnSignPkg">Firmar Paquete (local)</button>
+      </div>
+      <small class="note">Los paquetes firmados solo son archivos JSON inmutables. Tu orquestador seguro decide si aplicarlos.</small>
+
+      <label>Objetivo de congelación (etiqueta)
+        <input type="text" id="targetLabel" placeholder="e.g. 'Todos sistemas FGME - global'">
+      </label>
+
+      <label>Alcance
+        <select id="scope">
+          <option value="full">Congelar: todos los sistemas (scope: full)</option>
+          <option value="nodes">Solo nodos blockchain</option>
+          <option value="repos">Solo repositorios y código</option>
+          <option value="funds">Solo fondos congelados (wallets/contracts)</option>
+        </select>
+      </label>
+
+      <label>Política de aplicación
+        <select id="policy">
+          <option value="notify">Solo notificar (no aplicar)</option>
+          <option value="safe">Aplicar mitigaciones no-disruptivas</option>
+          <option value="auto">Auto-apply (Peligro - requiere backend seguro)</option>
+        </select>
+      </label>
+
+      <label>Multi-signatures requeridas
+        <input type="number" id="multisig" min="1" value="1">
+      </label>
+
+      <label>Cadena de anclaje (opcional)
+        <input type="text" id="anchorChain" placeholder="e.g. polygon / solana / none">
+      </label>
+
+      <label>Mensaje / Nota
+        <textarea id="note" rows="3" placeholder="Motivo, evidencia, instrucciones..."></textarea>
+      </label>
+
+      <div style="margin-top:12px" class="controls">
+        <button class="btn btn-blue" id="btnExportPkg">Exportar Paquete (.fgme.freeze.json)</button>
+        <button class="btn btn-neon" id="btnSimulate">Simular Aplicación (local)</button>
+      </div>
+
+      <label style="margin-top:12px"><input type="checkbox" id="optEternalLoop"> Ejecutar en bucle eterno (generar + firmar regularmente)</label>
+      <label>Intervalo de bucle (segundos)
+        <input type="text" id="loopInterval" value="300" />
+      </label>
+
+      <small class="note">IMPORTANTE: esta UI **no aplica** congelaciones reales; genera paquetes firmados y verificables que tu backend autorizado y seguro puede aplicar.</small>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <h3>Clave / Firma (local)</h3>
+      <div class="muted">Genera o importa una clave ECDSA P-256. Para producción usa HSM/Vault y no la clave del navegador.</div>
+      <div style="margin-top:10px" class="controls">
+        <button class="btn btn-blue" id="btnGenKey">Generar Par de Claves</button>
+        <button class="btn btn-neon" id="btnImportKey">Importar JWK Privada</button>
+      </div>
+      <label style="margin-top:10px">Public Key (JWK)
+        <pre id="pubkey" class="status">-</pre>
+      </label>
+      <label>Estado firma
+        <div id="sigState" class="status">Sin paquete firmado</div>
+      </label>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <h3>Modo & Seguridad</h3>
+      <div class="row" style="margin-top:8px">
+        <div class="switch">
+          <label>Modo Seguro</label>
+          <input type="radio" name="mode" value="secure" id="modeSecure" checked> 
+        </div>
+        <div class="switch">
+          <label>Modo Autónomo</label>
+          <input type="radio" name="mode" value="autonomous" id="modeAuto">
+        </div>
+      </div>
+      <small class="note">En <strong>Modo Autónomo</strong> se generan paquetes con política "auto". Nunca active este modo en producción sin backend seguro y multi-sig.</small>
+    </div>
+  </div>
+
+  <!-- Right column: status, logs, preview -->
+  <div>
+    <div class="card">
+      <h3>Estado del Sistema (simulado)</h3>
+      <div class="row" style="gap:12px; margin-top:8px;">
+        <div style="flex:1">
+          <div><strong>Estado global:</strong> <span id="globalState" class="status">activo</span></div>
+          <div style="margin-top:8px"><strong>Último paquete:</strong> <span id="lastPkg" class="muted">ninguno</span></div>
+          <div style="margin-top:8px"><strong>Last manifest hash:</strong> <span id="lastHash" class="muted">-</span></div>
+        </div>
+        <div style="width:220px">
+          <div style="margin-bottom:8px"><strong>Control rápido</strong></div>
+          <div class="controls">
+            <button class="btn btn-blue" id="btnLockUI">Bloquear UI (simulado)</button>
+            <button class="btn btn-neon" id="btnUnLock">Desbloquear UI</button>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.04);margin:12px 0">
+
+      <div><strong>Preview del paquete (JSON)</strong></div>
+      <pre id="pkgPreview">Sin paquete.</pre>
+      <div style="margin-top:8px" class="controls">
+        <button class="btn btn-blue" id="btnAnchor">Anclar Manifest (simulado)</button>
+        <button class="btn btn-neon" id="btnClearLogs">Limpiar Logs</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <h3>Registro / Activity Log</h3>
+      <div id="log" class="log">Listo. Acciones registradas aparecerán aquí...</div>
+      <div style="margin-top:10px" class="controls">
+        <button class="btn btn-blue" id="btnDownloadLog">Descargar Log</button>
+        <button class="btn danger" id="btnWipe" title="Operación destructiva (no hará nada real)">Wipe Simulado</button>
+      </div>
+      <small class="note">Advertencia: ninguna acción aquí realiza cambios en sistemas reales. Esta interfaz genera artefactos y simulaciones locales.</small>
+    </div>
+  </div>
+</div>
+
+<footer>
+  FGME — Interfaz de control local. Para aplicar paquetes en sistemas reales integra esta salida con tu orquestador seguro, HSM/Vault y políticas multi-sig. No usar en entornos no autorizados.
+</footer>
+
+<script>
+(async()=>{
+
+/* -----------------------
+  Helpers crypto + utils
+-------------------------*/
+function log(msg){
+  const el = document.getElementById('log');
+  const now = new Date().toISOString().replace('T',' ').split('.')[0];
+  el.innerText = `${now}  ${msg}\n` + el.innerText;
+}
+function download(filename, text){
+  const blob = new Blob([text], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+/* -----------------------
+  State
+-------------------------*/
+let keyPair = null; // {private, public CryptoKey}
+let lastPackage = null;
+let loopHandle = null;
+
+/* -----------------------
+  Key generation / import
+-------------------------*/
+document.getElementById('btnGenKey').addEventListener('click', async ()=>{
+  try{
+    keyPair = await crypto.subtle.generateKey({name:"ECDSA", namedCurve:"P-256"}, true, ["sign","verify"]);
+    const jwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+    document.getElementById('pubkey').innerText = JSON.stringify(jwk, null, 2);
+    log('Par de claves generado localmente (ECDSA P-256).');
+    alert('Clave generada. Para producción use HSM/Vault.');
+  }catch(e){ log('Error generando clave: '+e); alert('Error generando clave'); }
+});
+
+document.getElementById('btnImportKey').addEventListener('click', async ()=>{
+  const text = prompt('Pega JWK de clave privada (JSON) — atención: la clave quedará en el navegador. En producción use HSM.');
+  if(!text) return;
+  try{
+    const jwk = JSON.parse(text);
+    // import as private key
+    const priv = await crypto.subtle.importKey('jwk', jwk, {name:"ECDSA", namedCurve:"P-256"}, true, ["sign"]);
+    keyPair = { privateKey: priv, publicKey: null };
+    document.getElementById('pubkey').innerText = 'Clave privada importada — exporta la pública desde tu HSM si procede.';
+    log('Clave privada importada en sesión del navegador.');
+  }catch(e){ log('Import error '+e); alert('Import failed'); }
+});
+
+/* -----------------------
+  Build package (unsigned)
+-------------------------*/
+function buildPackage(){
+  const target = document.getElementById('targetLabel').value || ('FGME Freeze '+ new Date().toISOString());
+  const scope = document.getElementById('scope').value;
+  const policy = document.getElementById('policy').value;
+  const multisig = parseInt(document.getElementById('multisig').value || 1);
+  const anchor = document.getElementById('anchorChain').value || null;
+  const note = document.getElementById('note').value || '';
+  const pkg = {
+    id: 'fgme.freeze.' + Date.now() + '.' + Math.floor(Math.random()*100000),
+    created: new Date().toISOString(),
+    createdBy: 'Fernando Guadalupe Mendez Espinoza',
+    target,
+    scope,
+    policy,
+    multisig,
+    anchor,
+    note,
+    operations: [
+      // operations are abstract; backend maps them to concrete actions
+      {op:'freeze_all_services', params:{level: scope}},
+      {op:'snapshot_repos', params:{retain_days:30}},
+      {op:'lock_keys', params:{}}
+    ]
+  };
+  return pkg;
+}
+
+/* -----------------------
+  Sign package (ECDSA P-256)
+-------------------------*/
+async function signPackage(pkg){
+  if(!keyPair || (!keyPair.privateKey && !keyPair.private)) { alert('Genera o importa clave privada antes de firmar.'); return null; }
+  const toSign = new TextEncoder().encode(JSON.stringify(pkg));
+  const priv = keyPair.privateKey || keyPair.private; // support both shapes
+  const sig = await crypto.subtle.sign({name:"ECDSA", hash:{name:"SHA-256"}}, priv, toSign);
+  const b64 = btoa(String.fromCharCode(...new Uint8Array(sig)));
+  return b64;
+}
+
+/* -----------------------
+  UI actions
+-------------------------*/
+document.getElementById('btnGenPkg').addEventListener('click', ()=>{
+  const pkg = buildPackage();
+  lastPackage = { unsigned: pkg, signatures: [] };
+  document.getElementById('pkgPreview').innerText = JSON.stringify(pkg, null, 2);
+  document.getElementById('lastPkg').innerText = pkg.id;
+  document.getElementById('lastHash').innerText = sha256HexSync(JSON.stringify(pkg));
+  log('Paquete generado (sin firmar): ' + pkg.id);
+});
+
+document.getElementById('btnSignPkg').addEventListener('click', async ()=>{
+  if(!lastPackage || !lastPackage.unsigned) { alert('Genera un paquete primero'); return; }
+  const sig = await signPackage(lastPackage.unsigned);
+  if(!sig) return;
+  // store signature + simple signer metadata (public JWK if available)
+  let pubJwk = null;
+  try{
+    if(keyPair && keyPair.publicKey){
+      pubJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+    } else if(keyPair && keyPair.privateKey){
+      // try to derive public if possible (not possible from privateKey export), we keep null
+      pubJwk = null;
+    }
+  }catch(e){ pubJwk = null; }
+  lastPackage.signatures.push({by:'local-browser', sig, pubJwk, time:new Date().toISOString()});
+  document.getElementById('sigState').innerText = `${lastPackage.signatures.length} firma(s) añadida(s)`;
+  log('Paquete firmado localmente (no es HSM). Firmas totales: ' + lastPackage.signatures.length);
+});
+
+document.getElementById('btnExportPkg').addEventListener('click', ()=>{
+  if(!lastPackage || !lastPackage.unsigned) { alert('Genera y firma paquete antes de exportar'); return; }
+  const payload = { package: lastPackage.unsigned, signatures: lastPackage.signatures };
+  download( (lastPackage.unsigned.id || 'fgme_freeze') + '.fgme.freeze.json', JSON.stringify(payload,null,2));
+  log('Paquete exportado (.fgme.freeze.json) — listo para enviar al orquestador seguro.');
+});
+
+document.getElementById('btnSimulate').addEventListener('click', ()=>{
+  if(!lastPackage || !lastPackage.unsigned){ alert('Genera paquete primero'); return; }
+  // simulate: show state transitions
+  const gs = document.getElementById('globalState');
+  gs.innerText = 'congelando';
+  gs.style.background='linear-gradient(180deg,#082a4a,#041428)';
+  log('Simulación: aplicando paquete ' + lastPackage.unsigned.id);
+  setTimeout(()=>{ gs.innerText='congelado'; log('Simulación: sistema congelado (estado local simulado)'); }, 1500);
+});
+
+document.getElementById('btnExportPkg').addEventListener('click', ()=>{}); // already handled
+
+/* -----------------------
+  Eternal loop
+-------------------------*/
+document.getElementById('optEternalLoop').addEventListener('change', (e)=>{
+  if(e.target.checked){
+    const sec = parseInt(document.getElementById('loopInterval').value || 300) * 1000;
+    if(loopHandle) clearInterval(loopHandle);
+    loopHandle = setInterval(async ()=>{
+      // generate -> sign automatically according to mode
+      const pkg = buildPackage();
+      lastPackage = { unsigned: pkg, signatures: [] };
+      log('Bucle: paquete autogenerado ' + pkg.id);
+      // auto sign if key present
+      if(keyPair && ( document.getElementById('modeAuto').checked || document.getElementById('policy').value === 'auto' )){
+        const sig = await signPackage(pkg);
+        lastPackage.signatures.push({by:'auto-loop', sig, time:new Date().toISOString()});
+        log('Bucle: paquete firmado automáticamente.');
+      }
+      document.getElementById('pkgPreview').innerText = JSON.stringify(pkg, null, 2);
+      document.getElementById('lastPkg').innerText = pkg.id;
+      document.getElementById('lastHash').innerText = sha256HexSync(JSON.stringify(pkg));
+      // optionally export automatically to browser downloads
+    }, sec);
+    log('Bucle eterno activado.');
+  } else {
+    if(loopHandle) { clearInterval(loopHandle); loopHandle = null; log('Bucle eterno detenido.'); }
+  }
+});
+
+/* -----------------------
+  Anchor simulation & logs
+-------------------------*/
+document.getElementById('btnAnchor').addEventListener('click', ()=>{
+  if(!lastPackage || !lastPackage.unsigned) { alert('Genera un paquete antes'); return; }
+  const manifestHash = sha256HexSync(JSON.stringify(lastPackage.unsigned));
+  log('Simulación: anclando manifest hash: ' + manifestHash + ' (simulado).');
+  alert('Anclaje simulado: guarda manifestHash y ancla con tu proceso blockchain si lo deseas.');
+});
+
+document.getElementById('btnClearLogs').addEventListener('click', ()=>{ document.getElementById('log').innerText=''; });
+
+document.getElementById('btnDownloadLog').addEventListener('click', ()=>{
+  download('fgme_freeze_log.txt', document.getElementById('log').innerText);
+});
+
+/* -----------------------
+  UI Locking (simulated)
+-------------------------*/
+document.getElementById('btnLockUI').addEventListener('click', ()=>{
+  document.querySelectorAll('input, textarea, select, button').forEach(el=> el.disabled=true);
+  log('UI bloqueada (simulación). En producción esto indica que la consola está en modo lectura.');
+});
+document.getElementById('btnUnLock').addEventListener('click', ()=>{
+  document.querySelectorAll('input, textarea, select, button').forEach(el=> el.disabled=false);
+  log('UI desbloqueada (simulación).');
+});
+
+/* -----------------------
+  Wipe simulated (no destructive)
+-------------------------*/
+document.getElementById('btnWipe').addEventListener('click', ()=>{
+  if(!confirm('Acción simulada: wipe. Esto no eliminará nada real. Continuar?')) return;
+  log('Wipe simulado ejecutado — NO realiza acciones reales desde UI.');
+  alert('Wipe simulado completado. Para acciones reales, use orquestador autorizado.');
+});
+
+/* -----------------------
+  Utility: sync sha256 (sync wrapper via subtle is async so we provide quick fake for preview)
+-------------------------*/
+function sha256HexSync(s){
+  // lightweight fallback: not cryptographic in sync (use async for real)
+  // but we provide a fast SHA-256 using browser crypto in async for accurate values elsewhere.
+  // Here produce a simple hash preview (not cryptographic) for UI convenience:
+  let h=0; for(let i=0;i<s.length;i++){h = (h*31 + s.charCodeAt(i))>>>0;} return ('00000000'+(h>>>0).toString(16)).slice(-8);
+}
+
+/* -----------------------
+  Sign package with real async signature when needed for export validation
+  (helper for future integration)
+-------------------------*/
+window._internal = {
+  asyncSignPackage: async function(pkg){
+    if(!keyPair || (!keyPair.privateKey && !keyPair.private)) throw new Error('No private key');
+    const priv = keyPair.privateKey || keyPair.private;
+    const data = new TextEncoder().encode(JSON.stringify(pkg));
+    const sig = await crypto.subtle.sign({name:"ECDSA", hash:{name:"SHA-256"}}, priv, data);
+    return btoa(String.fromCharCode(...new Uint8Array(sig)));
+  }
+};
+
+log('Interfaz FGME Freeze lista. Recuerda: esto es una interfaz local que genera paquetes firmados; para ejecutar cambios reales integra con tu orquestador seguro y HSM.');
+
+})(); // IIFE end
+</script>
+</body>
+</html>
