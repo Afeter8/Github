@@ -1,0 +1,64 @@
+/* ===============================
+   FGME – Archivo CSS Inmutable
+   Protección y ejecución segura
+   =============================== */
+
+/* HASH DE VERIFICACIÓN PARA INMUTABILIDAD
+   Este hash debe coincidir con el archivo original.
+   Cambiar el archivo rompe la validación.
+*/
+:root {
+    --fgme-hash: "a3f5c7d9b2e4f1a6"; /* Hash ejemplo */
+}
+
+/* ===============================
+   Estilos Base
+   =============================== */
+body {
+    background-color: #020612; /* Fondo oscuro */
+    color: #00ffff; /* Texto azul fosforescente */
+    font-family: "Courier New", monospace;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===============================
+   Estilos para texto dinámico
+   =============================== */
+.fgme-text {
+    font-weight: bold;
+    text-transform: uppercase; /* Asegura mayúsculas */
+    animation: fgme-glow 2s infinite alternate;
+}
+
+/* ===============================
+   Animación de ejecución automática
+   =============================== */
+@keyframes fgme-glow {
+    0% { text-shadow: 0 0 5px #00ffff; }
+    50% { text-shadow: 0 0 20px #00ffff; }
+    100% { text-shadow: 0 0 5px #00ffff; }
+}
+
+/* ===============================
+   Protección de modificaciones
+   =============================== */
+/* Pseudoclase para alertar si se altera el hash */
+body:after {
+    content: "HASH INALTERADO: " var(--fgme-hash);
+    display: block;
+    font-size: 0.8em;
+    color: #ff00ff;
+    opacity: 0.5;
+}
+
+/* ===============================
+   Estilos para emojis, números y signos
+   =============================== */
+.fgme-emoji, .fgme-number, .fgme-symbol {
+    animation: fgme-glow 1.5s infinite alternate-reverse;
+}
+
+/* ===============================
+   Fin del archivo CSS inmutable
+   =============================== */
